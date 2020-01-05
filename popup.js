@@ -120,12 +120,19 @@ window.addEventListener('DOMContentLoaded', (event) => {
     const parent = document.getElementById('recipients');
     for (child of parent.querySelectorAll('.recipient'))
       parent.removeChild(child);
+
+    for (const node of event.target.querySelectorAll('input,select,textarea,button')) {
+      node.disabled = false;
+    }
   });
 
   document.getElementById('card').addEventListener('submit', (event) => {
     event.preventDefault();
     const form = event.target;
     const data = new FormData(form);
+    for (const node of form.querySelectorAll('input,select,textarea,button')) {
+      node.disabled = true;
+    }
     const progress = document.getElementById('progress');
     const statusText = document.getElementById('status_text');
     (async () => {
@@ -147,6 +154,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
       window.alert(chrome.i18n.getMessage('m1'));
       form.reset();
     })().catch(error => {
+      window.alert(chrome.i18n.getMessage('m4'));
       console.error(error);
     });
   });
