@@ -3,6 +3,10 @@
     "name": "Send Unipos together",
     "version": "0.0.1",
     "default_locale": "ja",
+    "description": "This extension allows you to send Unipos to multiple destinations at once.",
+    "icons": {
+        "128": "icon128.png"
+    },
     "page_action": {
         "default_title": "Send Unipos together",
         "default_popup": "popup.html"
