@@ -179,7 +179,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     RecipientNodes.new(text)
       .then(recipientNodes => recipientNodes.insertBefore(recipientsSlot))
       .then(() => {
-        recipient.value = ''
+        recipientsSlot.value = ''
       })
       .catch(console.error);
   });
