@@ -175,7 +175,18 @@ window.addEventListener('DOMContentLoaded', (event) => {
     if (event.key !== 'Enter') return;
     event.preventDefault();
     const recipientsSlot = event.target;
-    const text = recipientsSlot.value;
+    const text = event.target.value;
+    RecipientNodes.new(text)
+      .then(recipientNodes => recipientNodes.insertBefore(recipientsSlot))
+      .then(() => {
+        recipientsSlot.value = ''
+      })
+      .catch(console.error);
+  });
+
+  document.getElementById('recipients_slot').addEventListener('blur', (event) => {
+    const recipientsSlot = event.target;
+    const text = event.target.value;
     RecipientNodes.new(text)
       .then(recipientNodes => recipientNodes.insertBefore(recipientsSlot))
       .then(() => {
