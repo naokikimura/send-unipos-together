@@ -1,0 +1,28 @@
+body {
+  margin: 0;
+  padding: 10px;
+  min-width: 450px;
+}
+
+#card {
+  display: grid;
+}
+
+#recipients .recipient img {
+  width: 2em;
+}
+
+#recipient {
+  resize: none;
+}
+
+.recipient {
+  border: solid thin black;
+  margin: 0 .5ex;
+  border-radius: 2px;
+}
+
+.recipient.not_exist {
+  color: firebrick;
+  border-color: firebrick;
+}

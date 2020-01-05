@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" type="text/css" href="popup.css">
+  <script src="popup.js"></script>
+</head>
+
+<body>
+  <form action="" method="POST" enctype="multipart/form-data" id="card">
+    <span id="recipients">
+      <textarea name="recipient" id="recipient" autocomplete="off" spellcheck="false" rows="1" required
+        placeholder="宛先"></textarea>
+    </span>
+    <input type="number" name="point" id="point" min="0" max="120" required placeholder="ポイント" />
+    <textarea name="message" id="message" required placeholder="メッセージ"></textarea>
+    <span id="buttons">
+      <button type="reset">リセット</button>
+      <button type="submit">おくる</button>
+    </span>
+  </form>
+</body>
+
+</html>
