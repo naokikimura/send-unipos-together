@@ -159,7 +159,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
     mutations
       .filter(mutation => mutation.type === 'childList')
       .forEach(mutation => {
-        document.getElementById('recipient').required = mutation.target.querySelectorAll('.recipient').length === 0
+        const length = mutation.target.querySelectorAll('.recipient').length;
+        document.getElementById('recipient').required = length === 0;
+        (async () => {
+          const profile = await getProfile();
+          const availablePoint = profile.member.pocket.available_point;
+          document.getElementById('point').max = Math.min(120, availablePoint > 1 ? Math.floor(availablePoint / length) : availablePoint);
+        })().catch(console.error);
       });
   })).observe(document.getElementById('recipients'), { childList: true })
 });
