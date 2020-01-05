@@ -23,7 +23,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
           "jsonrpc": "2.0",
           "method": method,
           "params": params,
-          "id": new Date().getTime() * 1000 + Math.floor(Math.random() * 1000)
+          "id": String(new Date().getTime() * 1000 + Math.floor(Math.random() * 1000))
         }),
         "method": "POST"
       });
@@ -75,12 +75,19 @@ window.addEventListener('DOMContentLoaded', (event) => {
       recipient.classList.add('recipient');
       recipient.classList.add(member.id ? 'exist' : 'not_exist')
       const span = document.createElement('span');
+      span.classList.add('member');
       const img = document.createElement('img');
       img.src = member.picture_url || chrome.i18n.getMessage('m2');
       img.alt = member.display_name;
       span.appendChild(img);
       const name = member.display_name + (member.uname ? `(@${member.uname})` : '')
       span.appendChild(document.createTextNode(name));
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'to'
+      input.value = member.id || '';
+      input.title = name;
+      span.appendChild(input);
       recipient.appendChild(span);
       const button = document.createElement('button');
       button.textContent = '×';
@@ -88,11 +95,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
         recipient.parentNode.removeChild(recipient);
       });
       recipient.appendChild(button);
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = 'to'
-      input.value = member.id || '';
-      recipient.appendChild(input);
       return recipient;
     }
 
@@ -109,6 +111,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
   }
 
   document.getElementById('card').addEventListener('reset', (event) => {
+    const progress = document.getElementById('progress');
+    progress.value = 0;
+
+    const statusText = document.getElementById('status_text');
+    statusText.textContent = '';
+
     const parent = document.getElementById('recipients');
     for (child of parent.querySelectorAll('.recipient'))
       parent.removeChild(child);
@@ -118,16 +126,23 @@ window.addEventListener('DOMContentLoaded', (event) => {
     event.preventDefault();
     const form = event.target;
     const data = new FormData(form);
+    const progress = document.getElementById('progress');
+    const statusText = document.getElementById('status_text');
     (async () => {
       const profile = await getProfile();
       const from = profile.member.id;
       const point = Number(data.get('point'));
       const message = data.get('message');
-      for (const to of data.getAll('to')) {
+      const toList = data.getAll('to');
+      progress.max = toList.length;
+      for (const to of toList) {
+        progress.value += 1;
         if (to === '') continue;
+        const name = form.querySelector(`input[name="to"][value="${to}"]`).title;
+        statusText.textContent = chrome.i18n.getMessage('m3', name);
         const result = await sendCard(from, to, point, message);
         console.debug(result);
-        console.info(`Sent Unipos to ${to}`);
+        console.info(`Sent Unipos to ${name}}`);
       }
       window.alert(chrome.i18n.getMessage('m1'));
       form.reset();
