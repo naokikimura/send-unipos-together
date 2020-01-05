@@ -11,8 +11,19 @@
 <body>
   <form action="" method="POST" enctype="multipart/form-data" id="card">
     <span id="recipients">
-      <textarea name="recipient" id="recipient" autocomplete="off" spellcheck="false" rows="1" required
-        placeholder="宛先"></textarea>
+      <template id="recipient">
+        <span class="recipient">
+          <span class="member">
+            <img class="picture_url" src="" alt="" />
+            <span class="display_name"></span>
+            <span class="uname"></span>
+            <input class="id" type="hidden" name="to" title="" />
+          </span>
+          <button class="remove">×</button>
+        </span>
+      </template>
+      <textarea name="recipients_slot" id="recipients_slot" autocomplete="off" spellcheck="false" rows="1" required
+        autofocus placeholder="宛先"></textarea>
     </span>
     <input type="number" name="point" id="point" min="0" max="120" required placeholder="ポイント" />
     <textarea name="message" id="message" required placeholder="メッセージ"></textarea>

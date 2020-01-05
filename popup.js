@@ -77,31 +77,23 @@ window.addEventListener('DOMContentLoaded', (event) => {
     }
 
     static createRecipientElement(member) {
-      const recipient = document.createElement('span');
-      recipient.classList.add('recipient');
-      recipient.classList.add(member.id ? 'exist' : 'not_exist')
-      const span = document.createElement('span');
-      span.classList.add('member');
-      const img = document.createElement('img');
+      const fragment = document.importNode(document.getElementById('recipient').content, true);
+      const recipientElement = fragment.querySelector('.recipient');
+      recipientElement.classList.add(member.id ? 'exist' : 'not_exist');
+      const memberElement = recipientElement.querySelector('.member');
+      const img = memberElement.querySelector('img.picture_url');
       img.src = member.picture_url || chrome.i18n.getMessage('m2');
       img.alt = member.display_name;
-      span.appendChild(img);
-      const name = member.display_name + (member.uname ? `(@${member.uname})` : '')
-      span.appendChild(document.createTextNode(name));
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = 'to'
+      memberElement.querySelector('.display_name').textContent = member.display_name;
+      memberElement.querySelector('.uname').textContent = member.uname;
+      const input = memberElement.querySelector('input.id');
       input.value = member.id || '';
-      input.title = name;
-      span.appendChild(input);
-      recipient.appendChild(span);
-      const button = document.createElement('button');
-      button.textContent = '×';
+      input.title = member.display_name;
+      const button = recipientElement.querySelector('button.remove');
       button.addEventListener('click', event => {
-        recipient.parentNode.removeChild(recipient);
+        recipientElement.parentNode.removeChild(recipientElement);
       });
-      recipient.appendChild(button);
-      return recipient;
+      return fragment;
     }
 
     insertBefore(target) {
@@ -165,7 +157,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         statusText.textContent = chrome.i18n.getMessage('m3', name);
         const result = await api.sendCard(from, to, point, message);
         console.debug(result);
-        console.info(`Sent Unipos to ${name}}`);
+        console.info(`Sent Unipos to ${name}`);
       }
       window.alert(chrome.i18n.getMessage('m1'));
       form.reset();
@@ -175,22 +167,22 @@ window.addEventListener('DOMContentLoaded', (event) => {
     });
   });
 
-  document.getElementById('recipient').addEventListener('keypress', (event) => {
+  document.getElementById('recipients_slot').addEventListener('keypress', (event) => {
     if (event.key !== 'Enter') return;
     event.preventDefault();
     const recipient = event.target;
     const text = recipient.value;
-    (new Recipients(text)).insertBefore(document.getElementById('recipient'))
+    (new Recipients(text)).insertBefore(document.getElementById('recipients_slot'))
       .then(() => {
         recipient.value = ''
       })
       .catch(console.error);
   });
 
-  document.getElementById('recipient').addEventListener('paste', (event) => {
+  document.getElementById('recipients_slot').addEventListener('paste', (event) => {
     event.preventDefault();
     const text = event.clipboardData.getData('text/plain');
-    (new Recipients(text)).insertBefore(document.getElementById('recipient'))
+    (new Recipients(text)).insertBefore(document.getElementById('recipients_slot'))
       .catch(console.error);
   });
 
@@ -199,7 +191,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
       .filter(mutation => mutation.type === 'childList')
       .forEach(mutation => {
         const length = mutation.target.querySelectorAll('.recipient').length;
-        document.getElementById('recipient').required = length === 0;
+        document.getElementById('recipients_slot').required = length === 0;
         (async () => {
           const profile = await api.getProfile();
           const availablePoint = profile.member.pocket.available_point;
