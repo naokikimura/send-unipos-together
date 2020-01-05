@@ -71,13 +71,23 @@ window.addEventListener('DOMContentLoaded', (event) => {
     }
   }
 
-  class Recipients {
-    constructor(text) {
-      this.text = text;
+  class RecipientNodes {
+    static async new(text) {
+      const terms = text.split(/[\r\n]/).filter(term => term !== '');
+      const members = await Promise.all(terms.map(async term => {
+        const result = await api.findSuggestMembers(term);
+        return result.length === 1 ? result[0] : { display_name: term };
+      }));
+      return new RecipientNodes(...members);
     }
 
-    static createRecipientElement(member) {
-      const fragment = document.importNode(document.getElementById('recipient').content, true);
+    constructor(...members) {
+      this.members = members;
+      this.template = document.getElementById('recipient');
+    }
+
+    createNode(member) {
+      const fragment = document.importNode(this.template.content, true);
       const recipientElement = fragment.querySelector('.recipient');
       recipientElement.classList.add(member.id ? 'exist' : 'not_exist');
       const memberElement = recipientElement.querySelector('.member');
@@ -98,13 +108,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     insertBefore(target) {
       const parent = target.parentNode;
-      return Promise.all(
-        this.text.split(/[\r\n]/).filter(term => term !== '').map(async term => {
-          const result = await api.findSuggestMembers(term);
-          const member = result.length === 1 ? result[0] : { display_name: term };
-          parent.insertBefore(Recipients.createRecipientElement(member), target);
-        })
-      );
+      this.members.forEach(member => parent.insertBefore(this.createNode(member), target));
     }
   }
 
@@ -170,9 +174,10 @@ window.addEventListener('DOMContentLoaded', (event) => {
   document.getElementById('recipients_slot').addEventListener('keypress', (event) => {
     if (event.key !== 'Enter') return;
     event.preventDefault();
-    const recipient = event.target;
-    const text = recipient.value;
-    (new Recipients(text)).insertBefore(document.getElementById('recipients_slot'))
+    const recipientsSlot = event.target;
+    const text = recipientsSlot.value;
+    RecipientNodes.new(text)
+      .then(recipientNodes => recipientNodes.insertBefore(recipientsSlot))
       .then(() => {
         recipient.value = ''
       })
@@ -181,8 +186,10 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
   document.getElementById('recipients_slot').addEventListener('paste', (event) => {
     event.preventDefault();
+    const recipientsSlot = event.target;
     const text = event.clipboardData.getData('text/plain');
-    (new Recipients(text)).insertBefore(document.getElementById('recipients_slot'))
+    RecipientNodes.new(text)
+      .then(recipientNodes => recipientNodes.insertBefore(recipientsSlot))
       .catch(console.error);
   });
 
