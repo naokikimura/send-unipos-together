@@ -34,8 +34,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
   class UniposAPI {
     static async refreshToken(authnToken, refreshToken) {
-      const result = await JSONRPC.call('https://unipos.me/a/jsonrpc', 'Unipos.RefreshToken', { "authn_token": authnToken, "refresh_token": refreshToken });
-      return [result.authn_token, result.refresh_token];
+      return JSONRPC.call('https://unipos.me/a/jsonrpc', 'Unipos.RefreshToken', { "authn_token": authnToken, "refresh_token": refreshToken });
     }
 
     constructor(tokenStore = { load: async () => [], save: async (authnToken, refreshToken) => { } }) {
