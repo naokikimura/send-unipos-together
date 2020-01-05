@@ -99,7 +99,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     insertBefore(target) {
       const parent = target.parentNode;
       return Promise.all(
-        this.text.split(/[\r\n]/).map(async term => {
+        this.text.split(/[\r\n]/).filter(term => term !== '').map(async term => {
           const result = await findSuggestMembers(term);
           const member = result.length === 1 ? result[0] : { display_name: term };
           parent.insertBefore(Recipients.createRecipientElement(member), target);
