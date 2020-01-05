@@ -3,21 +3,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
     chrome.tabs.executeScript(...args.concat(resolve));
   });
 
-  const loadTokens = () => executeScript({
-    code: "[window.localStorage.getItem('authnToken'), window.localStorage.getItem('refreshToken')]"
-  }).then(results => results[0]);
-
-  const saveTokens = (authnToken, refreshToken) => executeScript({
-    code: `window.localStorage.setItem('authnToken', '${authnToken}'); window.localStorage.setItem('refreshToken', '${refreshToken}');`
-  });
-
   class JSONRPC {
-    static async call(url, method, params, token = null) {
-      const res = await fetch(url, {
+    static async call(url, method, params, configure = (request) => request) {
+      const request = new Request(url, {
         "headers": {
-          "accept": "*/*",
+          "accept": "application/json",
           "content-type": "application/json",
-          "x-unipos-token": token || undefined
         },
         "body": JSON.stringify({
           "jsonrpc": "2.0",
@@ -27,6 +18,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         }),
         "method": "POST"
       });
+      const res = await fetch(configure(request));
       const body = await res.json();
       if (body.error)
         throw new class JSONRPCError extends Error {
@@ -40,30 +32,45 @@ window.addEventListener('DOMContentLoaded', (event) => {
     }
   }
 
-  const refreshToken = async (authnToken, refreshToken) => {
-    const result = await JSONRPC.call('https://unipos.me/a/jsonrpc', 'Unipos.RefreshToken', { "authn_token": authnToken, "refresh_token": refreshToken });
-    await saveTokens(result.authn_token, result.refresh_token);
-    return [result.authn_token, result.refresh_token];
-  };
-
-  const callWithToken = async (...args) => {
-    const [aToken, rToken] = await loadTokens();
-    try {
-      return await JSONRPC.call.apply(undefined, args.concat(aToken));
-    } catch (error) {
-      if (error.code !== -40000) throw error;
-      const [authnToken] = await refreshToken(aToken, rToken);
-      return await JSONRPC.call.apply(undefined, args.concat(authnToken));
+  class UniposAPI {
+    static async refreshToken(authnToken, refreshToken) {
+      const result = await JSONRPC.call('https://unipos.me/a/jsonrpc', 'Unipos.RefreshToken', { "authn_token": authnToken, "refresh_token": refreshToken });
+      return [result.authn_token, result.refresh_token];
     }
-  };
 
-  const findSuggestMembers = (term, limit = 1000) =>
-    callWithToken('https://unipos.me/q/jsonrpc', 'Unipos.FindSuggestMembers', { "term": term, "limit": limit });
+    constructor(tokenStore = { load: async () => [], save: async (authnToken, refreshToken) => { } }) {
+      this.tokenStore = tokenStore;
+    }
 
-  const getProfile = () => callWithToken('https://unipos.me/q/jsonrpc', 'Unipos.GetProfile', []);
+    async call(...args) {
+      const configure = authnToken => req => {
+        const headers = new Headers(req.headers);
+        headers.append('x-unipos-token', authnToken);
+        return new Request(req, { headers: headers });
+      };
+      const [authnToken, refreshToken] = await this.tokenStore.load();
+      try {
+        return await JSONRPC.call(...args.concat(configure(authnToken)));
+      } catch (error) {
+        if (error.code !== -40000) throw error;
+        const result = await UniposAPI.refreshToken(authnToken, refreshToken);
+        await this.tokenStore.save(result.authn_token, result.refresh_token);
+        return await JSONRPC.call(...args.concat(configure(result.authn_token)));
+      }
+    }
 
-  const sendCard = (from, to, point, message) =>
-    callWithToken('https://unipos.me/c/jsonrpc', 'Unipos.SendCard', { 'from_member_id': from, 'to_member_id': to, 'point': point, 'message': message });
+    findSuggestMembers(term, limit = 1000) {
+      return this.call('https://unipos.me/q/jsonrpc', 'Unipos.FindSuggestMembers', { "term": term, "limit": limit });
+    }
+
+    getProfile() {
+      return this.call('https://unipos.me/q/jsonrpc', 'Unipos.GetProfile', []);
+    }
+
+    sendCard(from, to, point, message) {
+      return this.call('https://unipos.me/c/jsonrpc', 'Unipos.SendCard', { 'from_member_id': from, 'to_member_id': to, 'point': point, 'message': message });
+    }
+  }
 
   class Recipients {
     constructor(text) {
@@ -102,13 +109,23 @@ window.addEventListener('DOMContentLoaded', (event) => {
       const parent = target.parentNode;
       return Promise.all(
         this.text.split(/[\r\n]/).filter(term => term !== '').map(async term => {
-          const result = await findSuggestMembers(term);
+          const result = await api.findSuggestMembers(term);
           const member = result.length === 1 ? result[0] : { display_name: term };
           parent.insertBefore(Recipients.createRecipientElement(member), target);
         })
       );
     }
   }
+
+  const api = new UniposAPI({
+    load: () => executeScript({
+      code: "[window.localStorage.getItem('authnToken'), window.localStorage.getItem('refreshToken')]"
+    }).then(results => results[0]),
+
+    save: (authnToken, refreshToken) => executeScript({
+      code: `window.localStorage.setItem('authnToken', '${authnToken}'); window.localStorage.setItem('refreshToken', '${refreshToken}');`
+    })
+  });
 
   document.getElementById('card').addEventListener('reset', (event) => {
     const progress = document.getElementById('progress');
@@ -136,7 +153,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     const progress = document.getElementById('progress');
     const statusText = document.getElementById('status_text');
     (async () => {
-      const profile = await getProfile();
+      const profile = await api.getProfile();
       const from = profile.member.id;
       const point = Number(data.get('point'));
       const message = data.get('message');
@@ -147,7 +164,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         if (to === '') continue;
         const name = form.querySelector(`input[name="to"][value="${to}"]`).title;
         statusText.textContent = chrome.i18n.getMessage('m3', name);
-        const result = await sendCard(from, to, point, message);
+        const result = await api.sendCard(from, to, point, message);
         console.debug(result);
         console.info(`Sent Unipos to ${name}}`);
       }
@@ -185,7 +202,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         const length = mutation.target.querySelectorAll('.recipient').length;
         document.getElementById('recipient').required = length === 0;
         (async () => {
-          const profile = await getProfile();
+          const profile = await api.getProfile();
           const availablePoint = profile.member.pocket.available_point;
           document.getElementById('point').max = Math.min(120, availablePoint > 1 ? Math.floor(availablePoint / length) : availablePoint);
         })().catch(console.error);
