@@ -97,11 +97,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
   }
 
   class RecipientsElement {
-    static async new(element, template, ...values) {
-      const members = await Members.fetch(...values);
-      return new RecipientsElement(element, template).appendMember(...members);
-    }
-
     constructor(element, template) {
       this.element = element;
       this.template = template;
