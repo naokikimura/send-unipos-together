@@ -1,26 +1,44 @@
+@import url("https://unpkg.com/ress/dist/ress.min.css");
+@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
+
 body {
   margin: 0;
   padding: 10px;
   min-width: 450px;
+  color: #454a4a;
 }
 
 #card {
   display: grid;
 }
 
-.recipients .recipient {
-  border: solid thin black;
-  margin: 0 .5ex;
-  border-radius: 2px;
+#recipients_slot {
+  line-height: 1.5em;
 }
 
-.recipients .recipient.not_exist {
-  color: firebrick;
-  border-color: firebrick;
+.recipients .recipient {
+  color: #f74c40;
+  border: solid thin #f74c40;
+  padding: 0 1ex;
+  margin: .2ex .1ex;
+  border-radius: 1em;
+}
+
+.recipients .recipient.exist {
+  color: #454a4a;
+  border-color: #454a4a;
+}
+
+.recipients .recipient:last-child {
+  margin-right: 1ex;
 }
 
 .recipients .recipient img.picture_url {
-  width: 2em;
+  width: 1.5em;
+}
+
+.recipients .recipient .uname {
+  display: none;
 }
 
 .recipients .recipient.exist .uname::before {
@@ -31,6 +49,45 @@ body {
   content: ')';
 }
 
-#recipients_slot {
-  resize: none;
+#card input:focus, textarea:focus {
+  outline: 0;
+  border: 0;
+}
+
+#card #point::before {
+  content: '+';
+}
+
+#card #point input[name="point"] {
+  width: 5em;
+}
+
+#card #message textarea[name="message"] {
+  width: 100%;
+}
+
+#card button[type="submit"] {
+  padding: .5ex 1ex;
+  background-color: #55cbe1;
+  border-radius: 2px;
+  color: #ffffff;
+}
+
+#card:invalid button[type="submit"] {
+  color: #55cbe1;
+  background-color: #ffffff;  
+}
+
+#card button[type="submit"]::before {
+  content: 'send';
+  font-family: 'Material Icons';
+  margin-right: .5ex;
+}
+
+#card button[type="reset"] {
+  display: none;
+}
+
+#progress[value="0"] {
+  display: none;
 }

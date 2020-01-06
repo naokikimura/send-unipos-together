@@ -10,7 +10,7 @@
 
 <body>
   <form action="" method="POST" enctype="multipart/form-data" id="card">
-    <span>
+    <span id="recipients">
       <span class="recipients"></span>
       <template id="recipient">
         <span class="recipient">
@@ -26,8 +26,12 @@
       <input type="search" name="recipients_slot" id="recipients_slot" list="suggest_members" required autofocus placeholder="宛先" />
       <datalist id="suggest_members"></datalist>
     </span>
-    <input type="number" name="point" id="point" min="0" max="120" required placeholder="ポイント" />
-    <textarea name="message" id="message" required placeholder="メッセージ"></textarea>
+    <span id="point">
+      <input type="number" name="point" min="0" max="120" required placeholder="ポイント" />
+    </span>
+    <span id="message">
+      <textarea name="message" rows="3" required placeholder="メッセージ"></textarea>
+    </span>
     <span id="buttons">
       <button type="reset">リセット</button>
       <button type="submit">おくる</button>

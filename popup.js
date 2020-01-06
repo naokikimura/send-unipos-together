@@ -267,7 +267,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
         (async () => {
           const profile = await api.getProfile();
           const availablePoint = profile.member.pocket.available_point;
-          document.getElementById('point').max = Math.min(120, availablePoint > 1 ? Math.floor(availablePoint / length) : availablePoint);
+          document.querySelector('#point input[type="number"]').max
+            = Math.min(120, availablePoint > 1 ? Math.floor(availablePoint / length) : availablePoint);
         })().catch(console.error);
       });
   })).observe(recipients.element, { childList: true })
