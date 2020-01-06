@@ -6,7 +6,7 @@
         "message": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVQIHWP4DwABAQEANl9ngAAAAABJRU5ErkJggg=="
     },
     "m3": {
-        "message": "$TO$におくっています...",
+        "message": "$TO$さんにおくっています...",
         "placeholders": {
             "to": {
                 "content": "$1"
