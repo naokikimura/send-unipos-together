@@ -23,8 +23,8 @@
           <button class="remove">×</button>
         </span>
       </template>
-      <textarea name="recipients_slot" id="recipients_slot" autocomplete="off" spellcheck="false" rows="1" required
-        autofocus placeholder="宛先"></textarea>
+      <input type="search" name="recipients_slot" id="recipients_slot" list="suggest_members" required autofocus placeholder="宛先" />
+      <datalist id="suggest_members"></datalist>
     </span>
     <input type="number" name="point" id="point" min="0" max="120" required placeholder="ポイント" />
     <textarea name="message" id="message" required placeholder="メッセージ"></textarea>

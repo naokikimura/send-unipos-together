@@ -156,11 +156,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
   });
 
   document.getElementById('card').addEventListener('reset', (event) => {
-    const progress = document.getElementById('progress');
-    progress.value = 0;
-
-    const statusText = document.getElementById('status_text');
-    statusText.textContent = '';
+    document.getElementById('suggest_members').textContent = '';
+    document.getElementById('progress').value = 0;
+    document.getElementById('status_text').textContent = '';
 
     for (const node of event.target.querySelectorAll('.recipients'))
       node.textContent = '';
@@ -205,6 +203,29 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
   const recipients = new RecipientsElement(document.querySelector('form#card .recipients'), document.getElementById('recipient'));
 
+  document.getElementById('recipients_slot').addEventListener('input', (event) => {
+    const value = event.target.value;
+    api.findSuggestMembers(value, 10)
+      .then(members => {
+        const dataList = document.getElementById('suggest_members');
+        dataList.textContent = '';
+        dataList.appendChild(
+          members
+            .map(member => {
+              const option = document.createElement('option');
+              option.value = member.uname;
+              option.textContent = `${member.display_name} ${member.uname}`
+              return option;
+            })
+            .reduce((parent, child) => {
+              parent.appendChild(child);
+              return parent;
+            }, document.createDocumentFragment())
+        );
+      })
+      .catch(console.error);
+  });
+
   document.getElementById('recipients_slot').addEventListener('keypress', (event) => {
     if (event.key !== 'Enter') return;
     event.preventDefault();
@@ -214,6 +235,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
       .then(members => {
         recipients.appendMember(...members);
         recipientsSlot.value = ''
+        document.getElementById('suggest_members').textContent = '';
       })
       .catch(console.error);
   });
@@ -225,12 +247,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
       .then(members => {
         recipients.appendMember(...members);
         recipientsSlot.value = ''
+        document.getElementById('suggest_members').textContent = '';
       })
       .catch(console.error);
   });
 
   document.getElementById('recipients_slot').addEventListener('paste', (event) => {
-    console.debug(event);
+    if (event.target.value) return;
     event.preventDefault();
     const values = event.clipboardData.getData('text/plain').split(/[\r\n]/);
     Members.fetch(api, ...values)
