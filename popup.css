@@ -8,26 +8,26 @@ body {
   display: grid;
 }
 
-#recipients .recipient {
+.recipients .recipient {
   border: solid thin black;
   margin: 0 .5ex;
   border-radius: 2px;
 }
 
-#recipients .recipient.not_exist {
+.recipients .recipient.not_exist {
   color: firebrick;
   border-color: firebrick;
 }
 
-#recipients .recipient img.picture_url {
+.recipients .recipient img.picture_url {
   width: 2em;
 }
 
-#recipients .recipient.exist .uname::before {
+.recipients .recipient.exist .uname::before {
   content: '(@';
 }
 
-#recipients .recipient.exist .uname::after {
+.recipients .recipient.exist .uname::after {
   content: ')';
 }
 

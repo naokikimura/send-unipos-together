@@ -71,22 +71,52 @@ window.addEventListener('DOMContentLoaded', (event) => {
     }
   }
 
-  class RecipientNodes {
-    static async new(text) {
-      const terms = text.split(/[\r\n]/).filter(term => term !== '');
-      const members = await Promise.all(terms.map(async term => {
-        const result = await api.findSuggestMembers(term);
-        return result.length === 1 ? result[0] : { display_name: term };
-      }));
-      return new RecipientNodes(...members);
+  class Member {
+    static new(member) {
+      return new Member(member.id, member.uname, member.display_name, member.picture_url);
     }
 
-    constructor(...members) {
-      this.members = members;
-      this.template = document.getElementById('recipient');
+    static async find(api, term) {
+      const result = await api.findSuggestMembers(term);
+      return Member.new(result.length === 1 ? result[0] : { display_name: term });
     }
 
-    createNode(member) {
+    constructor(id, uname, display_name, picture_url) {
+      this.id = id;
+      this.uname = uname;
+      this.display_name = display_name;
+      this.picture_url = picture_url;
+    }
+  }
+
+  class Members {
+    static async fetch(api, ...values) {
+      const terms = values.map(term => term.trim()).filter(term => term !== '');
+      return Promise.all(terms.map(async term => Member.find(api, term)));
+    }
+  }
+
+  class RecipientsElement {
+    static async new(element, template, ...values) {
+      const members = await Members.fetch(...values);
+      return new RecipientsElement(element, template).appendMember(...members);
+    }
+
+    constructor(element, template) {
+      this.element = element;
+      this.template = template;
+    }
+
+    get members() {
+      return Array.from(this.element.querySelectorAll('.member')).map(node => new Member(
+        node.querySelector('input.id').value,
+        node.querySelector('.uname').textContent,
+        node.querySelector('.display_name').textContent,
+        node.querySelector('img.picture_url').src
+      ));
+    }
+
+    createRecipientNode(member) {
       const fragment = document.importNode(this.template.content, true);
       const recipientElement = fragment.querySelector('.recipient');
       recipientElement.classList.add(member.id ? 'exist' : 'not_exist');
@@ -106,9 +136,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
       return fragment;
     }
 
-    insertBefore(target) {
-      const parent = target.parentNode;
-      this.members.forEach(member => parent.insertBefore(this.createNode(member), target));
+    appendMember(...members) {
+      members.reduce((element, member) => {
+        element.appendChild(this.createRecipientNode(member))
+        return element;
+      }, this.element);
+      return this;
     }
   }
 
@@ -129,9 +162,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
     const statusText = document.getElementById('status_text');
     statusText.textContent = '';
 
-    const parent = document.getElementById('recipients');
-    for (child of parent.querySelectorAll('.recipient'))
-      parent.removeChild(child);
+    for (const node of event.target.querySelectorAll('.recipients'))
+      node.textContent = '';
 
     for (const node of event.target.querySelectorAll('input,select,textarea,button')) {
       node.disabled = false;
@@ -171,14 +203,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
     });
   });
 
+  const recipients = new RecipientsElement(document.querySelector('form#card .recipients'), document.getElementById('recipient'));
+
   document.getElementById('recipients_slot').addEventListener('keypress', (event) => {
     if (event.key !== 'Enter') return;
     event.preventDefault();
     const recipientsSlot = event.target;
-    const text = event.target.value;
-    RecipientNodes.new(text)
-      .then(recipientNodes => recipientNodes.insertBefore(recipientsSlot))
-      .then(() => {
+    const value = event.target.value;
+    Members.fetch(api, value)
+      .then(members => {
+        recipients.appendMember(...members);
         recipientsSlot.value = ''
       })
       .catch(console.error);
@@ -186,21 +220,23 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
   document.getElementById('recipients_slot').addEventListener('blur', (event) => {
     const recipientsSlot = event.target;
-    const text = event.target.value;
-    RecipientNodes.new(text)
-      .then(recipientNodes => recipientNodes.insertBefore(recipientsSlot))
-      .then(() => {
+    const value = event.target.value;
+    Members.fetch(api, value)
+      .then(members => {
+        recipients.appendMember(...members);
         recipientsSlot.value = ''
       })
       .catch(console.error);
   });
 
   document.getElementById('recipients_slot').addEventListener('paste', (event) => {
+    console.debug(event);
     event.preventDefault();
-    const recipientsSlot = event.target;
-    const text = event.clipboardData.getData('text/plain');
-    RecipientNodes.new(text)
-      .then(recipientNodes => recipientNodes.insertBefore(recipientsSlot))
+    const values = event.clipboardData.getData('text/plain').split(/[\r\n]/);
+    Members.fetch(api, ...values)
+      .then(members => {
+        recipients.appendMember(...members);
+      })
       .catch(console.error);
   });
 
@@ -216,5 +252,5 @@ window.addEventListener('DOMContentLoaded', (event) => {
           document.getElementById('point').max = Math.min(120, availablePoint > 1 ? Math.floor(availablePoint / length) : availablePoint);
         })().catch(console.error);
       });
-  })).observe(document.getElementById('recipients'), { childList: true })
+  })).observe(recipients.element, { childList: true })
 });
