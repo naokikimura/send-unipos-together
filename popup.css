@@ -6,13 +6,39 @@ body {
   padding: 10px;
   min-width: 450px;
   color: #454a4a;
+  background-image: linear-gradient(to right, #d9efed, #f3f5e1);
 }
 
-#card {
+form#card {
   display: grid;
 }
 
-#recipients_slot {
+form#card > #recipients {
+  background-color: #ffffff;
+  border-right: #e6f39c 2px solid;
+  border-left: #8bdde1 2px solid;
+  padding: .5ex .5ex 0;
+}
+
+form#card > #point {
+  background-color: #ffffff;
+  border-right: #e6f39c 2px solid;
+  border-left: #8bdde1 2px solid;
+  padding: 0 .5ex;
+}
+
+form#card > #message {
+  background-color: #ffffff;
+  border-right: #e6f39c 2px solid;
+  border-left: #8bdde1 2px solid;
+  padding: 0 .5ex .5ex;
+}
+
+form#card > #buttons {
+  margin-top: 1ex;
+}
+
+input#recipients_slot {
   line-height: 1.5em;
 }
 
@@ -71,11 +97,13 @@ body {
   background-color: #55cbe1;
   border-radius: 2px;
   color: #ffffff;
+  border: solid thin #55cbe1;
 }
 
 #card:invalid button[type="submit"] {
-  color: #55cbe1;
-  background-color: #ffffff;  
+  color: #d3d8d8;
+  border-color: #d3d8d8;
+  background-color: #ffffff;
 }
 
 #card button[type="submit"]::before {
