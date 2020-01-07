@@ -272,4 +272,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
         })().catch(console.error);
       });
   })).observe(recipients.element, { childList: true })
+
+  document.querySelector('#card #message textarea[name="message"]').addEventListener('input', (event) => {
+    const textarea = event.target;
+    while (textarea.scrollHeight > textarea.offsetHeight) textarea.rows++;
+  });
 });
