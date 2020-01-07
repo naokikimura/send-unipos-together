@@ -1,4 +1,4 @@
-import JSONRPC from './jsonrpc.js';
+import JSONRPC from '../jsonrpc.js';
 
 export default class UniposAPI {
   static async refreshToken(authnToken, refreshToken) {
