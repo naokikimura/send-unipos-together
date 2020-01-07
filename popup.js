@@ -1,75 +1,9 @@
+import UniposAPI from './unipos/api.js';
+
 window.addEventListener('DOMContentLoaded', (event) => {
   const executeScript = (...args) => new Promise((resolve, reject) => {
     chrome.tabs.executeScript(...args.concat(resolve));
   });
-
-  class JSONRPC {
-    static async call(url, method, params, configure = (request) => request) {
-      const request = new Request(url, {
-        "headers": {
-          "accept": "application/json",
-          "content-type": "application/json",
-        },
-        "body": JSON.stringify({
-          "jsonrpc": "2.0",
-          "method": method,
-          "params": params,
-          "id": String(new Date().getTime() * 1000 + Math.floor(Math.random() * 1000))
-        }),
-        "method": "POST"
-      });
-      const res = await fetch(configure(request));
-      const body = await res.json();
-      if (body.error)
-        throw new class JSONRPCError extends Error {
-          constructor(error) {
-            super(error.message);
-            this.code = error.code;
-            this.data = error.data;
-          }
-        }(body.error);
-      return body.result;
-    }
-  }
-
-  class UniposAPI {
-    static async refreshToken(authnToken, refreshToken) {
-      return JSONRPC.call('https://unipos.me/a/jsonrpc', 'Unipos.RefreshToken', { "authn_token": authnToken, "refresh_token": refreshToken });
-    }
-
-    constructor(tokenStore = { load: async () => [], save: async (authnToken, refreshToken) => { } }) {
-      this.tokenStore = tokenStore;
-    }
-
-    async call(...args) {
-      const configure = authnToken => req => {
-        const headers = new Headers(req.headers);
-        headers.append('x-unipos-token', authnToken);
-        return new Request(req, { headers: headers });
-      };
-      const [authnToken, refreshToken] = await this.tokenStore.load();
-      try {
-        return await JSONRPC.call(...args.concat(configure(authnToken)));
-      } catch (error) {
-        if (error.code !== -40000) throw error;
-        const result = await UniposAPI.refreshToken(authnToken, refreshToken);
-        await this.tokenStore.save(result.authn_token, result.refresh_token);
-        return await JSONRPC.call(...args.concat(configure(result.authn_token)));
-      }
-    }
-
-    findSuggestMembers(term, limit = 1000) {
-      return this.call('https://unipos.me/q/jsonrpc', 'Unipos.FindSuggestMembers', { "term": term, "limit": limit });
-    }
-
-    getProfile() {
-      return this.call('https://unipos.me/q/jsonrpc', 'Unipos.GetProfile', []);
-    }
-
-    sendCard(from, to, point, message) {
-      return this.call('https://unipos.me/c/jsonrpc', 'Unipos.SendCard', { 'from_member_id': from, 'to_member_id': to, 'point': point, 'message': message });
-    }
-  }
 
   class Member {
     static new(member) {
