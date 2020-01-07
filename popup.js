@@ -277,4 +277,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
     const textarea = event.target;
     while (textarea.scrollHeight > textarea.offsetHeight) textarea.rows++;
   });
+
+  chrome.storage.sync.get(['options'], result => {
+    const { recipientMembers = [], point = null, message = '' } = result.options || {};
+    recipients.appendMember(...(recipientMembers.map(Member.new)));
+    document.querySelector('form#card [name="point"]').value = point === null ? '' : point;
+    document.querySelector('form#card [name="message"]').value = message;
+  });
 });
