@@ -7,24 +7,33 @@
   <title>Send Unipos together</title>
   <link rel="stylesheet" type="text/css" href="popup.css">
   <script type="module" src="popup.js"></script>
+  <template id="unipos-member">
+    <link rel="stylesheet" href="unipos/member/style.css">
+    <slot name="id">id</slot>
+    <slot name="picture"><img src="" alt="" /></slot>
+    <slot name="display_name">display_name</slot>
+    <slot name="uname">uname</slot>
+  </template>
+  <template id="recipient">
+    <span class="recipient">
+      <unipos-member class="member">
+        <span slot="id"></span>
+        <span slot="uname"></span>
+        <span slot="display_name"></span>
+        <img slot="picture" src="" alt="">
+      </unipos-member>
+      <input type="hidden" name="to" title="" />
+      <button class="remove">×</button>
+    </span>
+  </template>
 </head>
 
 <body>
   <form action="" method="POST" enctype="multipart/form-data" id="card">
     <span id="recipients">
       <span class="recipients"></span>
-      <template id="recipient">
-        <span class="recipient">
-          <span class="member">
-            <img class="picture_url" src="" alt="" />
-            <span class="display_name"></span>
-            <span class="uname"></span>
-            <input class="id" type="hidden" name="to" title="" />
-          </span>
-          <button class="remove">×</button>
-        </span>
-      </template>
-      <input type="search" name="recipients_slot" id="recipients_slot" list="suggest_members" required autofocus placeholder="宛先" />
+      <input type="search" name="recipients_slot" id="recipients_slot" list="suggest_members" required autofocus
+        placeholder="宛先" />
       <datalist id="suggest_members"></datalist>
     </span>
     <span id="point">

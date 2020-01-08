@@ -1,0 +1,11 @@
+slot[name="uname"] {
+  display: none;
+}
+
+slot[name="uname"]::before {
+  content: '(@';
+}
+
+slot[name="uname"]::after {
+  content: ')';
+}

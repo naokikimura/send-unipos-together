@@ -1,4 +1,7 @@
 import UniposAPI from './unipos/api.js';
+import defineUniposMemberElement from './unipos/member/element.js';
+
+window.customElements.define('unipos-member', defineUniposMemberElement(document.getElementById('unipos-member')));
 
 window.addEventListener('DOMContentLoaded', (event) => {
   const executeScript = (...args) => new Promise((resolve, reject) => {
@@ -37,25 +40,21 @@ window.addEventListener('DOMContentLoaded', (event) => {
     }
 
     get members() {
-      return Array.from(this.element.querySelectorAll('.member')).map(node => new Member(
-        node.querySelector('input.id').value,
-        node.querySelector('.uname').textContent,
-        node.querySelector('.display_name').textContent,
-        node.querySelector('img.picture_url').src
-      ));
+      return Array.from(this.element.querySelectorAll('unipos-member')).map(node => Member.new(node.member));
     }
 
     createRecipientNode(member) {
       const fragment = document.importNode(this.template.content, true);
       const recipientElement = fragment.querySelector('.recipient');
       recipientElement.classList.add(member.id ? 'exist' : 'not_exist');
-      const memberElement = recipientElement.querySelector('.member');
-      const img = memberElement.querySelector('img.picture_url');
+      const memberElement = recipientElement.querySelector('unipos-member');
+      const img = memberElement.querySelector('img[slot="picture"]');
       img.src = member.picture_url || chrome.i18n.getMessage('m2');
       img.alt = member.display_name;
-      memberElement.querySelector('.display_name').textContent = member.display_name;
-      memberElement.querySelector('.uname').textContent = member.uname;
-      const input = memberElement.querySelector('input.id');
+      memberElement.querySelector('[slot="display_name"]').textContent = member.display_name;
+      memberElement.querySelector('[slot="uname"]').textContent = member.uname;
+      memberElement.querySelector('[slot="id"]').textContent = member.id || '';
+      const input = recipientElement.querySelector('input[name="to"]');
       input.value = member.id || '';
       input.title = member.display_name;
       const button = recipientElement.querySelector('button.remove');
@@ -116,7 +115,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
       for (const to of toList) {
         progress.value += 1;
         if (to === '') continue;
-        const name = form.querySelector(`input[name="to"][value="${to}"]`).title;
+        const name = form.querySelector(`[name="to"][value="${CSS.escape(to)}"]`).title;
         statusText.textContent = chrome.i18n.getMessage('m3', name);
         const result = await api.sendCard(from, to, point, message);
         console.debug(result);

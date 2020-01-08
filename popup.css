@@ -59,20 +59,16 @@ input#recipients_slot {
   margin-right: 1ex;
 }
 
-.recipients .recipient img.picture_url {
+.recipients .recipient unipos-member [slot="picture"] {
   width: 1.5em;
 }
 
-.recipients .recipient .uname {
+.recipients .recipient unipos-member [slot="id"] {
   display: none;
 }
 
-.recipients .recipient.exist .uname::before {
-  content: '(@';
-}
-
-.recipients .recipient.exist .uname::after {
-  content: ')';
+.recipients .recipient unipos-member::shadow slot[name="uname"] {
+  display: none;
 }
 
 #card input:focus, textarea:focus {
