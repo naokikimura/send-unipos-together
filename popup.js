@@ -1,7 +1,5 @@
 import UniposAPI from './unipos/api.js';
-import defineUniposMemberElement from './unipos/member/element.js';
-
-window.customElements.define('unipos-member', defineUniposMemberElement(document.getElementById('unipos-member')));
+import UniposMemberElement from './unipos/member/element.js';
 
 window.addEventListener('DOMContentLoaded', (event) => {
   const executeScript = (...args) => new Promise((resolve, reject) => {

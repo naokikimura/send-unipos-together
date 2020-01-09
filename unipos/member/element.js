@@ -1,19 +1,26 @@
-export default function define(template) {
-  return class UniposMemberElement extends HTMLElement {
-    constructor() {
-      super();
-      const shadow = this.attachShadow({ mode: "open" });
-      const document = template.ownerDocument;
-      shadow.appendChild(document.importNode(template.content, true));
-    }
+const assignedNodes = (slot, options = { flatten: false }) => {
+  const nodes = slot.assignedNodes(options);
+  return nodes.length ? nodes : Array.from(slot.childNodes);
+};
 
-    get member() {
-      return {
-        id: this.shadowRoot.querySelector('slot[name="id"]').assignedElements().reduce((text, node) => text + node.textContent, ''),
-        uname: this.shadowRoot.querySelector('slot[name="uname"]').assignedElements().reduce((text, node) => text + node.textContent, ''),
-        display_name: this.shadowRoot.querySelector('slot[name="display_name"]').assignedElements().reduce((text, node) => text + node.textContent, ''),
-        picture_url: this.shadowRoot.querySelector('slot[name="picture"]').assignedElements().filter(e => e.tagName === 'IMG' || e.querySelector('img'))[0].src
-      };
-    }
-  };
-}
+class UniposMemberElement extends HTMLElement {
+  constructor() {
+    super();
+    const shadow = this.attachShadow({ mode: "open" });
+    const template = document.getElementById('unipos-member');
+    shadow.appendChild(document.importNode(template.content, true));
+  }
+
+  get member() {
+    return {
+      id: assignedNodes(this.shadowRoot.querySelector('slot[name="id"]')).reduce((text, node) => text + node.textContent, ''),
+      uname: assignedNodes(this.shadowRoot.querySelector('slot[name="uname"]')).reduce((text, node) => text + node.textContent, ''),
+      display_name: assignedNodes(this.shadowRoot.querySelector('slot[name="display_name"]')).reduce((text, node) => text + node.textContent, ''),
+      picture_url: assignedNodes(this.shadowRoot.querySelector('slot[name="picture"]')).filter(e => e.tagName === 'IMG' || e.querySelector('img'))[0].getAttribute('src')
+    };
+  }
+};
+
+window.customElements.define('unipos-member', UniposMemberElement);
+
+export default UniposMemberElement;
