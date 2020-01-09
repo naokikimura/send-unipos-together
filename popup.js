@@ -27,6 +27,10 @@ window.addEventListener('DOMContentLoaded', (event) => {
       return Array.from(this.element.querySelectorAll('unipos-member')).map(node => node.member);
     }
 
+    findMembers(...ids) {
+      return this.members.filter(member => ids.includes(member.id));
+    }
+
     createRecipientNode(member) {
       const fragment = document.importNode(this.template.content, true);
       const recipientElement = fragment.querySelector('unipos-recipient');
@@ -87,14 +91,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
       const from = profile.member.id;
       const point = Number(data.get('point'));
       const message = data.get('message');
-      const toList = data.getAll('to');
-      progress.max = toList.length;
-      for (const to of toList) {
+      const members = recipients.findMembers(...data.getAll('to'));
+      progress.max = members.length;
+      for (const member of members) {
         progress.value += 1;
-        if (to === '') continue;
-        const name = form.querySelector(`[name="to"][value="${CSS.escape(to)}"]`).title;
+        if (!member.id) continue;
+        const name = member.display_name;
         statusText.textContent = chrome.i18n.getMessage('m3', name);
-        const result = await api.sendCard(from, to, point, message);
+        const result = await api.sendCard(from, member.id, point, message);
         console.debug(result);
         console.info(`Sent Unipos to ${name}`);
       }
@@ -172,7 +176,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     mutations
       .filter(mutation => mutation.type === 'childList')
       .forEach(mutation => {
-        const length = mutation.target.querySelectorAll('.recipient').length;
+        const length = mutation.target.querySelectorAll('unipos-member').length;
         document.getElementById('recipients_slot').required = length === 0;
         (async () => {
           const profile = await api.getProfile();
