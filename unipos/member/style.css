@@ -1,5 +1,6 @@
-slot[name="uname"] {
-  display: none;
+slot[name="picture"] img,
+::slotted(img[slot="picture"]) {
+  width: 1.5em;
 }
 
 slot[name="uname"]::before {

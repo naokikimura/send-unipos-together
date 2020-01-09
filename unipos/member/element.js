@@ -3,7 +3,7 @@ const assignedNodes = (slot, options = { flatten: false }) => {
   return nodes.length ? nodes : Array.from(slot.childNodes);
 };
 
-class UniposMemberElement extends HTMLElement {
+export default class UniposMemberElement extends HTMLElement {
   constructor() {
     super();
     const shadow = this.attachShadow({ mode: "open" });
@@ -22,5 +22,3 @@ class UniposMemberElement extends HTMLElement {
 };
 
 window.customElements.define('unipos-member', UniposMemberElement);
-
-export default UniposMemberElement;
