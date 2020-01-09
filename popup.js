@@ -6,28 +6,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
     chrome.tabs.executeScript(...args.concat(resolve));
   });
 
-  class Member {
-    static new(member) {
-      return new Member(member.id, member.uname, member.display_name, member.picture_url);
-    }
-
-    static async find(api, term) {
-      const result = await api.findSuggestMembers(term);
-      return Member.new(result.length === 1 ? result[0] : { display_name: term });
-    }
-
-    constructor(id, uname, display_name, picture_url) {
-      this.id = id;
-      this.uname = uname;
-      this.display_name = display_name;
-      this.picture_url = picture_url;
-    }
-  }
-
   class Members {
     static async fetch(api, ...values) {
+      const find = async (term) => {
+        const result = await api.findSuggestMembers(term);
+        return result.length === 1 ? result[0] : { display_name: term };
+      };
       const terms = values.map(term => term.trim()).filter(term => term !== '');
-      return Promise.all(terms.map(async term => Member.find(api, term)));
+      return Promise.all(terms.map(find));
     }
   }
 
@@ -38,7 +24,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     }
 
     get members() {
-      return Array.from(this.element.querySelectorAll('unipos-member')).map(node => Member.new(node.member));
+      return Array.from(this.element.querySelectorAll('unipos-member')).map(node => node.member);
     }
 
     createRecipientNode(member) {
@@ -204,7 +190,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
   chrome.storage.sync.get(['options'], result => {
     const { recipientMembers = [], point = null, message = '' } = result.options || {};
-    recipients.appendMember(...(recipientMembers.map(Member.new)));
+    recipients.appendMember(...recipientMembers);
     document.querySelector('form#card [name="point"]').value = point === null ? '' : point;
     document.querySelector('form#card [name="message"]').value = message;
   });
