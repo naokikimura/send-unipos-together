@@ -9,10 +9,10 @@
   <script type="module" src="popup.js"></script>
   <template id="unipos-member">
     <link rel="stylesheet" href="unipos/member/style.css">
-    <slot name="id">id</slot>
-    <slot name="picture"><img src="" alt="" /></slot>
-    <slot name="display_name">display_name</slot>
-    <slot name="uname">uname</slot>
+    <slot name="id" part="id">id</slot>
+    <slot name="picture" part="picture"><img src="" alt="" /></slot>
+    <slot name="display_name" part="display_name">display_name</slot>
+    <slot name="uname" part="uname">uname</slot>
   </template>
   <template id="recipient">
     <span class="recipient">

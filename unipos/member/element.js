@@ -9,10 +9,10 @@ export default function define(template) {
 
     get member() {
       return {
-        id: this.shadowRoot.querySelector('slot[name="id"]').textContent,
-        uname: this.shadowRoot.querySelector('slot[name="uname"]').textContent,
-        display_name: this.shadowRoot.querySelector('slot[name="display_name"]').textContent,
-        picture_url: this.shadowRoot.querySelector('slot[name="picture"] img').src
+        id: this.shadowRoot.querySelector('slot[name="id"]').assignedElements().reduce((text, node) => text + node.textContent, ''),
+        uname: this.shadowRoot.querySelector('slot[name="uname"]').assignedElements().reduce((text, node) => text + node.textContent, ''),
+        display_name: this.shadowRoot.querySelector('slot[name="display_name"]').assignedElements().reduce((text, node) => text + node.textContent, ''),
+        picture_url: this.shadowRoot.querySelector('slot[name="picture"]').assignedElements().filter(e => e.tagName === 'IMG' || e.querySelector('img'))[0].src
       };
     }
   };

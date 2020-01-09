@@ -59,15 +59,8 @@ input#recipients_slot {
   margin-right: 1ex;
 }
 
-.recipients .recipient unipos-member [slot="picture"] {
-  width: 1.5em;
-}
-
-.recipients .recipient unipos-member [slot="id"] {
-  display: none;
-}
-
-.recipients .recipient unipos-member::shadow slot[name="uname"] {
+.recipients .recipient unipos-member::part(id),
+.recipients .recipient unipos-member::part(uname) {
   display: none;
 }
 
