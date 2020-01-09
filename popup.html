@@ -14,17 +14,27 @@
     <slot name="display_name" part="display_name">display_name</slot>
     <slot name="uname" part="uname">uname</slot>
   </template>
-  <template id="recipient">
-    <span class="recipient">
-      <unipos-member class="member">
+  <template id="unipos-recipient">
+    <link rel="stylesheet" href="unipos/recipient/style.css">
+    <slot name="member" part="member">
+      <unipos-member>
         <span slot="id"></span>
         <span slot="uname"></span>
         <span slot="display_name"></span>
         <img slot="picture" src="" alt="">
       </unipos-member>
-      <input type="hidden" name="to" title="" />
-      <button class="remove">×</button>
-    </span>
+    </slot>
+    <button id="remove">×</button>
+  </template>
+  <template id="recipient">
+    <unipos-recipient name="to">
+      <unipos-member slot="member">
+        <span slot="id"></span>
+        <span slot="uname"></span>
+        <span slot="display_name"></span>
+        <img slot="picture" src="" alt="">
+      </unipos-member>
+    </unipos-recipient>
   </template>
 </head>
 

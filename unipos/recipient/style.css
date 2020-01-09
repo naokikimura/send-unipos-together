@@ -1,0 +1,14 @@
+@import url("https://unpkg.com/ress/dist/ress.min.css");
+
+:host {
+  color: #f74c40;
+  border: solid thin #f74c40;
+  padding: 0 1ex;
+  margin: .2ex .1ex;
+  border-radius: 1em;
+}
+
+:host(.exist) {
+  color: #454a4a;
+  border-color: #454a4a;
+}

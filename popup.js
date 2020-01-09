@@ -1,5 +1,5 @@
 import UniposAPI from './unipos/api.js';
-import UniposMemberElement from './unipos/member/element.js';
+import UniposRecipientElement from './unipos/recipient/element.js';
 
 window.addEventListener('DOMContentLoaded', (event) => {
   const executeScript = (...args) => new Promise((resolve, reject) => {
@@ -43,7 +43,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     createRecipientNode(member) {
       const fragment = document.importNode(this.template.content, true);
-      const recipientElement = fragment.querySelector('.recipient');
+      const recipientElement = fragment.querySelector('unipos-recipient');
       recipientElement.classList.add(member.id ? 'exist' : 'not_exist');
       const memberElement = recipientElement.querySelector('unipos-member');
       const img = memberElement.querySelector('img[slot="picture"]');
@@ -52,13 +52,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
       memberElement.querySelector('[slot="display_name"]').textContent = member.display_name;
       memberElement.querySelector('[slot="uname"]').textContent = member.uname;
       memberElement.querySelector('[slot="id"]').textContent = member.id || '';
-      const input = recipientElement.querySelector('input[name="to"]');
-      input.value = member.id || '';
-      input.title = member.display_name;
-      const button = recipientElement.querySelector('button.remove');
-      button.addEventListener('click', event => {
-        recipientElement.parentNode.removeChild(recipientElement);
-      });
       return fragment;
     }
 

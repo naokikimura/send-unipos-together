@@ -42,25 +42,17 @@ input#recipients_slot {
   line-height: 1.5em;
 }
 
-.recipients .recipient {
-  color: #f74c40;
-  border: solid thin #f74c40;
+.recipients unipos-recipient {
   padding: 0 1ex;
   margin: .2ex .1ex;
-  border-radius: 1em;
 }
 
-.recipients .recipient.exist {
-  color: #454a4a;
-  border-color: #454a4a;
-}
-
-.recipients .recipient:last-child {
+.recipients unipos-recipient:last-child {
   margin-right: 1ex;
 }
 
-.recipients .recipient unipos-member::part(id),
-.recipients .recipient unipos-member::part(uname) {
+.recipients unipos-recipient unipos-member::part(id),
+.recipients unipos-recipient unipos-member::part(uname) {
   display: none;
 }
 
