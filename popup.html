@@ -7,6 +7,9 @@
   <title>Send Unipos together</title>
   <link rel="stylesheet" type="text/css" href="popup.css">
   <script type="module" src="popup.js"></script>
+  <script type="module" src="unipos/suggest-members/element.js"></script>
+  <script type="module" src="unipos/recipient/element.js"></script>
+  <script type="module" src="unipos/member/element.js"></script>
   <template id="unipos-member">
     <link rel="stylesheet" href="unipos/member/style.css">
     <slot name="id" part="id">id</slot>
@@ -42,7 +45,7 @@
   <form action="" method="POST" enctype="multipart/form-data" id="card">
     <span id="recipients">
       <span class="recipients"></span>
-      <input type="search" name="recipients_slot" id="recipients_slot" list="suggest_members" required autofocus
+      <input is="unipos-suggest-members" type="search" name="recipients_slot" id="recipients_slot" list="suggest_members" required autofocus
         placeholder="宛先" />
       <datalist id="suggest_members"></datalist>
     </span>

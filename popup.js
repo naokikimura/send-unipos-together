@@ -1,5 +1,4 @@
 import UniposAPI from './unipos/api.js';
-import UniposRecipientElement from './unipos/recipient/element.js';
 
 window.addEventListener('DOMContentLoaded', (event) => {
   const executeScript = (...args) => new Promise((resolve, reject) => {
@@ -112,28 +111,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
   const recipients = new RecipientsElement(document.querySelector('form#card .recipients'), document.getElementById('recipient'));
 
-  document.getElementById('recipients_slot').addEventListener('input', (event) => {
-    const value = event.target.value;
-    api.findSuggestMembers(value, 10)
-      .then(members => {
-        const dataList = document.getElementById('suggest_members');
-        dataList.textContent = '';
-        dataList.appendChild(
-          members
-            .map(member => {
-              const option = document.createElement('option');
-              option.value = member.uname;
-              option.textContent = `${member.display_name} ${member.uname}`
-              return option;
-            })
-            .reduce((parent, child) => {
-              parent.appendChild(child);
-              return parent;
-            }, document.createDocumentFragment())
-        );
-      })
-      .catch(console.error);
-  });
+  document.getElementById('recipients_slot').findSuggestMembers = (value) => api.findSuggestMembers(value, 10);
 
   document.getElementById('recipients_slot').addEventListener('keypress', (event) => {
     if (event.key !== 'Enter') return;

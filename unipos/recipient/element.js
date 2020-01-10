@@ -1,5 +1,3 @@
-import UniposMemberElement from '../member/element.js';
-
 const assignedNodes = (slot, options = { flatten: false }) => {
   const nodes = slot.assignedNodes(options);
   return nodes.length ? nodes : Array.from(slot.childNodes);
