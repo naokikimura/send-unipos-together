@@ -9,33 +9,18 @@ body {
   background-image: linear-gradient(to right, #d9efed, #f3f5e1);
 }
 
-form#card {
+fieldset {
+  border: 0;
+}
+
+form#card > fieldset {
   display: grid;
-}
-
-form#card > #recipients {
   background-color: #ffffff;
-  border-right: #e6f39c 2px solid;
-  border-left: #8bdde1 2px solid;
-  padding: .5ex .5ex 0;
-}
-
-form#card > #point {
-  background-color: #ffffff;
-  border-right: #e6f39c 2px solid;
-  border-left: #8bdde1 2px solid;
-  padding: 0 .5ex;
-}
-
-form#card > #message {
-  background-color: #ffffff;
-  border-right: #e6f39c 2px solid;
-  border-left: #8bdde1 2px solid;
-  padding: 0 .5ex .5ex;
-}
-
-form#card > #buttons {
-  margin-top: 1ex;
+  border: 2px solid transparent;
+  border-right-color: #e6f39c;
+  border-left-color: #8bdde1;
+  padding: .5ex;
+  margin-bottom: 1ex;
 }
 
 input#recipients_slot {
