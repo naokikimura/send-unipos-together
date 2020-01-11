@@ -7,6 +7,7 @@
   <title>Send Unipos together</title>
   <link rel="stylesheet" type="text/css" href="popup.css">
   <script type="module" src="popup.js"></script>
+  <script type="module" src="unipos/message/element.js"></script>
   <script type="module" src="unipos/suggest-members/element.js"></script>
   <script type="module" src="unipos/recipients/element.js"></script>
   <script type="module" src="unipos/recipient/element.js"></script>
@@ -61,7 +62,7 @@
         <input type="number" name="point" min="0" max="120" required placeholder="ポイント" />
       </span>
       <span id="message">
-        <textarea name="message" rows="3" required placeholder="メッセージ"></textarea>
+        <textarea is="unipos-message" name="message" rows="3" required placeholder="メッセージ"></textarea>
       </span>
     </fieldset>
     <fieldset id="buttons">

@@ -79,11 +79,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
       });
   })).observe(recipients, { childList: true, subtree: true });
 
-  document.querySelector('#card #message textarea[name="message"]').addEventListener('input', (event) => {
-    const textarea = event.target;
-    while (textarea.scrollHeight > textarea.offsetHeight) textarea.rows++;
-  });
-
   chrome.storage.sync.get(['options'], result => {
     const { recipientMembers = [], point = null, message = '' } = result.options || {};
     recipients.appendMember(...recipientMembers);
