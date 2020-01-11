@@ -8,6 +8,7 @@
   <link rel="stylesheet" type="text/css" href="popup.css">
   <script type="module" src="popup.js"></script>
   <script type="module" src="unipos/suggest-members/element.js"></script>
+  <script type="module" src="unipos/recipients/element.js"></script>
   <script type="module" src="unipos/recipient/element.js"></script>
   <script type="module" src="unipos/member/element.js"></script>
   <template id="unipos-member">
@@ -29,15 +30,19 @@
     </slot>
     <button id="remove">×</button>
   </template>
-  <template id="recipient">
-    <unipos-recipient name="to">
-      <unipos-member slot="member">
-        <span slot="id"></span>
-        <span slot="uname"></span>
-        <span slot="display_name"></span>
-        <img slot="picture" src="" alt="">
-      </unipos-member>
-    </unipos-recipient>
+  <template id="unipos-recipients">
+    <template id="recipient">
+      <unipos-recipient>
+        <unipos-member slot="member">
+          <span slot="id"></span>
+          <span slot="uname"></span>
+          <span slot="display_name"></span>
+          <img slot="picture" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+            alt="">
+        </unipos-member>
+      </unipos-recipient>
+    </template>
+    <slot name="recipients" part="recipients"></slot>
   </template>
 </head>
 
@@ -45,9 +50,11 @@
   <form action="" method="POST" enctype="multipart/form-data" id="card">
     <fieldset>
       <fieldset>
-        <span class="recipients"></span>
+        <unipos-recipients id="recipients" name="to">
+          <span slot="recipients" class="recipients"></span>
+        </unipos-recipients>
         <input is="unipos-suggest-members" type="search" name="recipients_slot" id="recipients_slot"
-          list="suggest_members" required autofocus placeholder="宛先" />
+          list="suggest_members" recipients="recipients" required autofocus placeholder="宛先" />
         <datalist id="suggest_members"></datalist>
       </fieldset>
       <span id="point">

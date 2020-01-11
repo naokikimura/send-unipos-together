@@ -3,11 +3,19 @@ const assignedNodes = (slot, options = { flatten: false }) => {
   return nodes.length ? nodes : Array.from(slot.childNodes);
 };
 
+const assignedElements = (slot, options = { flatten: false }) => {
+  const elements = slot.assignedElements(options);
+  return elements.length ? elements : Array.from(slot.children);
+};
+
 export default class UniposRecipientElement extends HTMLElement {
+  static get observedAttributes() { return ['disabled']; }
   static get formAssociated() { return true; }
 
   constructor() {
     super();
+    this.disabled = false;
+    this.pastForm = null;
     this.internals = this.attachInternals();
     const shadow = this.attachShadow({ mode: "open" });
     const template = document.getElementById('unipos-recipient');
@@ -15,23 +23,33 @@ export default class UniposRecipientElement extends HTMLElement {
     shadow.getElementById('remove').addEventListener('click', (event) => {
       this.parentNode.removeChild(this);
     });
-    const memberSlot = shadow.querySelector('slot[name="member"]');
-    memberSlot.addEventListener('slotchange', (event) => {
-      this.updateFormValue();
-      assignedNodes(memberSlot).forEach(node => {
-        new MutationObserver((mutations) => {
-          this.updateFormValue();
-        }).observe(node, { childList: true, characterData: true, subtree: true });
-      });
-    });
   }
 
-  updateFormValue() {
-    this.internals.setFormValue((this.member || {}).id);
+  formAssociatedCallback(form) {
+    this.pastForm && this.pastForm.removeEventListener('formdata', this.formdataEventListener);
+    form.addEventListener('formdata', this.formdataEventListener);
+    this.pastForm = form;
   }
 
-  connectedCallback() {
-    this.updateFormValue();
+  formDisabledCallback(disabled) {
+    this.disabled = disabled;
+    this.shadowRoot.getElementById('remove').disabled = disabled;
+  }
+
+  formdataEventListener = (event) => {
+    if (this.disabled) return;
+    const data = event.formData;
+    data.append(this.name, this.member.id);
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (name === 'disabled') {
+      this.disabled = newValue != null;
+    }
+  }
+
+  get form() {
+    return this.internals.form;
   }
 
   get name() {
@@ -43,8 +61,10 @@ export default class UniposRecipientElement extends HTMLElement {
   }
 
   get member() {
-    return assignedNodes(this.shadowRoot.querySelector('slot[name="member"]'))
-      .filter(node => node.nodeName === 'UNIPOS-MEMBER' || node.querySelector('unipos-member'))[0].member;
+    const slot = this.shadowRoot.querySelector('slot[name="member"]');
+    const elements = assignedElements(slot)
+      .filter(element => element.tagName === 'UNIPOS-MEMBER' || element.querySelector('unipos-member'));
+    return (elements[0] || {}).member;
   }
 }
 
