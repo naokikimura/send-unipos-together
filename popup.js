@@ -15,23 +15,23 @@ window.addEventListener('DOMContentLoaded', (event) => {
     })
   });
 
-  document.getElementById('card').addEventListener('reset', (event) => {
+  document.getElementById('send_card').addEventListener('reset', (event) => {
     document.getElementById('progress').value = 0;
     document.getElementById('status_text').textContent = '';
 
     for (const node of event.target.querySelectorAll('.recipients'))
       node.textContent = '';
 
-    for (const node of event.target.querySelectorAll('input,select,textarea,button')) {
+    for (const node of event.target.querySelectorAll('fieldset#card, fieldset#buttons')) {
       node.disabled = false;
     }
   });
 
-  document.getElementById('card').addEventListener('submit', (event) => {
+  document.getElementById('send_card').addEventListener('submit', (event) => {
     event.preventDefault();
     const form = event.target;
     const data = new FormData(form);
-    for (const node of form.querySelectorAll('input,select,textarea,button')) {
+    for (const node of form.querySelectorAll('fieldset#card, fieldset#buttons')) {
       node.disabled = true;
     }
     const progress = document.getElementById('progress');
@@ -87,7 +87,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
   chrome.storage.sync.get(['options'], result => {
     const { recipientMembers = [], point = null, message = '' } = result.options || {};
     recipients.appendMember(...recipientMembers);
-    document.querySelector('form#card [name="point"]').value = point === null ? '' : point;
-    document.querySelector('form#card [name="message"]').value = message;
+    document.querySelector('fieldset#card [name="point"]').value = point === null ? '' : point;
+    document.querySelector('fieldset#card [name="message"]').value = message;
   });
 });

@@ -47,8 +47,8 @@
 </head>
 
 <body>
-  <form action="" method="POST" enctype="multipart/form-data" id="card">
-    <fieldset>
+  <form action="" method="POST" enctype="multipart/form-data" id="send_card">
+    <fieldset id="card">
       <fieldset>
         <unipos-recipients id="recipients" name="to">
           <span slot="recipients" class="recipients"></span>
@@ -64,10 +64,10 @@
         <textarea name="message" rows="3" required placeholder="メッセージ"></textarea>
       </span>
     </fieldset>
-    <span id="buttons">
+    <fieldset id="buttons">
       <button type="reset">リセット</button>
       <button type="submit">おくる</button>
-    </span>
+    </fieldset>
     <span id="status">
       <span id="status_text"></span>
       <progress id="progress" value="0"></progress>

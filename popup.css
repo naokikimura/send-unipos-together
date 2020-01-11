@@ -13,52 +13,53 @@ fieldset {
   border: 0;
 }
 
-form#card > fieldset {
+fieldset#card {
   display: grid;
   background-color: #ffffff;
-  border: 2px solid transparent;
-  border-right-color: #e6f39c;
-  border-left-color: #8bdde1;
+  border-image: linear-gradient(to right, #8bdde1, #e6f39c);
+  border-image-slice: 1;
+  border-width: 2px;
+  border-style: solid;
   padding: .5ex;
   margin-bottom: 1ex;
 }
 
-input#recipients_slot {
+fieldset#card input#recipients_slot {
   line-height: 1.5em;
 }
 
-.recipients unipos-recipient {
+fieldset#card .recipients unipos-recipient {
   padding: 0 1ex;
   margin: .2ex .1ex;
 }
 
-.recipients unipos-recipient:last-child {
+fieldset#card .recipients unipos-recipient:last-child {
   margin-right: 1ex;
 }
 
-.recipients unipos-recipient unipos-member::part(id),
-.recipients unipos-recipient unipos-member::part(uname) {
+fieldset#card .recipients unipos-recipient unipos-member::part(id),
+fieldset#card .recipients unipos-recipient unipos-member::part(uname) {
   display: none;
 }
 
-#card input:focus, textarea:focus {
+fieldset#card input:focus, textarea:focus {
   outline: 0;
   border: 0;
 }
 
-#card #point::before {
+fieldset#card #point::before {
   content: '+';
 }
 
-#card #point input[name="point"] {
+fieldset#card #point input[name="point"] {
   width: 5em;
 }
 
-#card #message textarea[name="message"] {
+fieldset#card #message textarea[name="message"] {
   width: 100%;
 }
 
-#card button[type="submit"] {
+form#send_card button[type="submit"] {
   padding: .5ex 1ex;
   background-color: #55cbe1;
   border-radius: 2px;
@@ -66,19 +67,19 @@ input#recipients_slot {
   border: solid thin #55cbe1;
 }
 
-#card:invalid button[type="submit"] {
+form#send_card:invalid button[type="submit"] {
   color: #d3d8d8;
   border-color: #d3d8d8;
   background-color: #ffffff;
 }
 
-#card button[type="submit"]::before {
+form#send_card button[type="submit"]::before {
   content: 'send';
   font-family: 'Material Icons';
   margin-right: .5ex;
 }
 
-#card button[type="reset"] {
+form#send_card button[type="reset"] {
   display: none;
 }
 
