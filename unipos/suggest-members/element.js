@@ -4,7 +4,7 @@ export default class UniposSuggestMembersElement extends HTMLInputElement {
     this.findSuggestMembers = (value) => Promise.resolve([]);
     const find = async (...values) => {
       const findBy = async (term) => {
-        const result = await this.findSuggestMembers(term);
+        const result = (await this.findSuggestMembers(term)) || [];
         return result.length === 1 ? result[0] : { display_name: term };
       };
       const terms = values.map(term => term.trim()).filter(term => term !== '');

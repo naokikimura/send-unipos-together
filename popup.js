@@ -60,17 +60,21 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
   const recipients = document.getElementById('recipients');
   recipients.addEventListener('change', (event) => {
-    (async () => {
-      const length = recipients.members.length;
-      document.getElementById('recipients_slot').required = length === 0;
-      const profile = await api.getProfile();
-      const availablePoint = profile.member.pocket.available_point;
-      document.querySelector('#point input[type="number"]').max
-        = Math.min(120, availablePoint > 1 ? Math.floor(availablePoint / length) : availablePoint);
-    })().catch(console.error);
+    const length = recipients.members.length;
+    document.getElementById('recipients_slot').required = length === 0;
   });
 
-  document.getElementById('recipients_slot').findSuggestMembers = (value) => api.findSuggestMembers(value, 10);
+  document.querySelector('#point input[is="unipos-point"]').fetchAvailablePoint = async () => {
+    try {
+      const profile = await api.getProfile();
+      return profile && profile.member.pocket.available_point;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  document.getElementById('recipients_slot').findSuggestMembers
+    = (value) => api.findSuggestMembers(value, 10).catch(console.error);
 
   chrome.storage.sync.get(['options'], result => {
     const { recipientMembers = [], point = null, message = '' } = result.options || {};
