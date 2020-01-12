@@ -13,7 +13,14 @@
   <script type="module" src="unipos/recipients/element.js"></script>
   <script type="module" src="unipos/recipient/element.js"></script>
   <template id="unipos-recipient">
-    <link rel="stylesheet" href="unipos/recipient/style.css">
+    <style>
+      @import url("unipos/recipient/style.css");
+
+      /* Hack to eliminate flicker */
+      img {
+        width: 0;
+      }
+    </style>
     <span id="member" part="member">
       <span id="member-id" part="member-id"></span>
       <img id="member-picture" part="member-picture" src="" alt="" />
