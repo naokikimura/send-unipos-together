@@ -8,11 +8,18 @@ export default class UniposRecipientsElement extends HTMLElement {
     this.internals = this.attachInternals();
     this.internals.setFormValue(null);
     this.pastForm = null;
+    (new MutationObserver((mutations) => {
+      mutations
+        .filter(mutation => mutation.type === 'childList')
+        .forEach(mutation => {
+          this.dispatchEvent(new CustomEvent('change', { detail: mutation }));
+        });
+    })).observe(this, { childList: true, subtree: true });
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (name === 'disabled') {
-      this.disabled = newValue != null;
+      this.disabled = newValue !== null;
     }
   }
 

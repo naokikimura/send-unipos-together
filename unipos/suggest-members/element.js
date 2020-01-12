@@ -47,6 +47,7 @@ export default class UniposSuggestMembersElement extends HTMLInputElement {
     });
 
     this.addEventListener('blur', (event) => {
+      if (!this.recipients) return;
       find(this.value)
         .then(members => {
           this.recipients && this.recipients.appendMember(...members);
@@ -56,6 +57,7 @@ export default class UniposSuggestMembersElement extends HTMLInputElement {
     });
 
     this.addEventListener('paste', (event) => {
+      if (!this.recipients) return;
       if (event.target.value) return;
       event.preventDefault();
       const values = event.clipboardData.getData('text/plain').split(/[\r\n]/);
