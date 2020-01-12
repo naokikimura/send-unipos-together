@@ -9,90 +9,57 @@ body {
   background-image: linear-gradient(to right, #d9efed, #f3f5e1);
 }
 
-form#card {
+fieldset {
+  border: 0;
+}
+
+fieldset#card {
   display: grid;
-}
-
-form#card > #recipients {
   background-color: #ffffff;
-  border-right: #e6f39c 2px solid;
-  border-left: #8bdde1 2px solid;
-  padding: .5ex .5ex 0;
+  border-image: linear-gradient(to right, #8bdde1, #e6f39c);
+  border-image-slice: 1;
+  border-width: 2px;
+  border-style: solid;
+  padding: .5ex;
+  margin-bottom: 1ex;
 }
 
-form#card > #point {
-  background-color: #ffffff;
-  border-right: #e6f39c 2px solid;
-  border-left: #8bdde1 2px solid;
-  padding: 0 .5ex;
-}
-
-form#card > #message {
-  background-color: #ffffff;
-  border-right: #e6f39c 2px solid;
-  border-left: #8bdde1 2px solid;
-  padding: 0 .5ex .5ex;
-}
-
-form#card > #buttons {
-  margin-top: 1ex;
-}
-
-input#recipients_slot {
+fieldset#card input#recipients_slot {
   line-height: 1.5em;
 }
 
-.recipients .recipient {
-  color: #f74c40;
-  border: solid thin #f74c40;
+fieldset#card unipos-recipients unipos-recipient {
   padding: 0 1ex;
   margin: .2ex .1ex;
-  border-radius: 1em;
 }
 
-.recipients .recipient.exist {
-  color: #454a4a;
-  border-color: #454a4a;
-}
-
-.recipients .recipient:last-child {
+fieldset#card unipos-recipients unipos-recipient:last-child {
   margin-right: 1ex;
 }
 
-.recipients .recipient img.picture_url {
-  width: 1.5em;
-}
-
-.recipients .recipient .uname {
+fieldset#card unipos-recipients unipos-recipient::part(member-id),
+fieldset#card unipos-recipients unipos-recipient::part(member-uname) {
   display: none;
 }
 
-.recipients .recipient.exist .uname::before {
-  content: '(@';
-}
-
-.recipients .recipient.exist .uname::after {
-  content: ')';
-}
-
-#card input:focus, textarea:focus {
+fieldset#card input:focus, textarea:focus {
   outline: 0;
   border: 0;
 }
 
-#card #point::before {
+fieldset#card #point::before {
   content: '+';
 }
 
-#card #point input[name="point"] {
+fieldset#card #point input[name="point"] {
   width: 5em;
 }
 
-#card #message textarea[name="message"] {
+fieldset#card #message textarea[name="message"] {
   width: 100%;
 }
 
-#card button[type="submit"] {
+form#send_card button[type="submit"] {
   padding: .5ex 1ex;
   background-color: #55cbe1;
   border-radius: 2px;
@@ -100,19 +67,19 @@ input#recipients_slot {
   border: solid thin #55cbe1;
 }
 
-#card:invalid button[type="submit"] {
+form#send_card:invalid button[type="submit"] {
   color: #d3d8d8;
   border-color: #d3d8d8;
   background-color: #ffffff;
 }
 
-#card button[type="submit"]::before {
+form#send_card button[type="submit"]::before {
   content: 'send';
   font-family: 'Material Icons';
   margin-right: .5ex;
 }
 
-#card button[type="reset"] {
+form#send_card button[type="reset"] {
   display: none;
 }
 

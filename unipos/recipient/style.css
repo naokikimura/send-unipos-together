@@ -1,0 +1,33 @@
+:host {
+  color: #f74c40;
+  border: solid thin #f74c40;
+  padding: 0 1ex;
+  margin: .2ex .1ex;
+  border-radius: 1em;
+}
+
+:host([data-id]) {
+  color: #454a4a;
+  border-color: #454a4a;
+}
+
+#member-picture {
+  width: 1.5em;
+}
+
+#member-uname::before {
+  content: '(@';
+}
+
+#member-uname::after {
+  content: ')';
+}
+
+button#remove {
+  background-color: transparent;
+  border: 0;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  appearance: none;
+}

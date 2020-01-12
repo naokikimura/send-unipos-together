@@ -7,36 +7,51 @@
   <title>Send Unipos together</title>
   <link rel="stylesheet" type="text/css" href="popup.css">
   <script type="module" src="popup.js"></script>
+  <script type="module" src="unipos/point/element.js"></script>
+  <script type="module" src="unipos/message/element.js"></script>
+  <script type="module" src="unipos/suggest-members/element.js"></script>
+  <script type="module" src="unipos/recipients/element.js"></script>
+  <script type="module" src="unipos/recipient/element.js"></script>
+  <template id="unipos-recipient">
+    <style>
+      @import url("unipos/recipient/style.css");
+
+      /* Hack to eliminate flicker */
+      img {
+        width: 0;
+      }
+    </style>
+    <span id="member" part="member">
+      <span id="member-id" part="member-id"></span>
+      <img id="member-picture" part="member-picture" src="" alt="" />
+      <span id="member-display_name" part="member-display_name"></span>
+      <span id="member-uname" part="member-uname"></span>
+    </span>
+    <button id="remove" part="remeve">×</button>
+  </template>
 </head>
 
 <body>
-  <form action="" method="POST" enctype="multipart/form-data" id="card">
-    <span id="recipients">
-      <span class="recipients"></span>
-      <template id="recipient">
-        <span class="recipient">
-          <span class="member">
-            <img class="picture_url" src="" alt="" />
-            <span class="display_name"></span>
-            <span class="uname"></span>
-            <input class="id" type="hidden" name="to" title="" />
-          </span>
-          <button class="remove">×</button>
-        </span>
-      </template>
-      <input type="search" name="recipients_slot" id="recipients_slot" list="suggest_members" required autofocus placeholder="宛先" />
-      <datalist id="suggest_members"></datalist>
-    </span>
-    <span id="point">
-      <input type="number" name="point" min="0" max="120" required placeholder="ポイント" />
-    </span>
-    <span id="message">
-      <textarea name="message" rows="3" required placeholder="メッセージ"></textarea>
-    </span>
-    <span id="buttons">
+  <form action="" method="POST" enctype="multipart/form-data" id="send_card">
+    <fieldset id="card">
+      <fieldset>
+        <unipos-recipients id="recipients" name="to"></unipos-recipients>
+        <input is="unipos-suggest-members" type="search" name="recipients_slot" id="recipients_slot"
+          list="suggest_members" recipients="recipients" required autofocus placeholder="宛先" />
+        <datalist id="suggest_members"></datalist>
+      </fieldset>
+      <span id="point">
+        <input is="unipos-point" type="number" name="point" min="0" max="120" recipients="recipients" required
+          placeholder="ポイント" />
+      </span>
+      <span id="message">
+        <textarea is="unipos-message" name="message" rows="3" required placeholder="メッセージ"></textarea>
+      </span>
+    </fieldset>
+    <fieldset id="buttons">
       <button type="reset">リセット</button>
       <button type="submit">おくる</button>
-    </span>
+    </fieldset>
     <span id="status">
       <span id="status_text"></span>
       <progress id="progress" value="0"></progress>

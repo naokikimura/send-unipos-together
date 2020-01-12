@@ -5,75 +5,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
     chrome.tabs.executeScript(...args.concat(resolve));
   });
 
-  class Member {
-    static new(member) {
-      return new Member(member.id, member.uname, member.display_name, member.picture_url);
-    }
-
-    static async find(api, term) {
-      const result = await api.findSuggestMembers(term);
-      return Member.new(result.length === 1 ? result[0] : { display_name: term });
-    }
-
-    constructor(id, uname, display_name, picture_url) {
-      this.id = id;
-      this.uname = uname;
-      this.display_name = display_name;
-      this.picture_url = picture_url;
-    }
-  }
-
-  class Members {
-    static async fetch(api, ...values) {
-      const terms = values.map(term => term.trim()).filter(term => term !== '');
-      return Promise.all(terms.map(async term => Member.find(api, term)));
-    }
-  }
-
-  class RecipientsElement {
-    constructor(element, template) {
-      this.element = element;
-      this.template = template;
-    }
-
-    get members() {
-      return Array.from(this.element.querySelectorAll('.member')).map(node => new Member(
-        node.querySelector('input.id').value,
-        node.querySelector('.uname').textContent,
-        node.querySelector('.display_name').textContent,
-        node.querySelector('img.picture_url').src
-      ));
-    }
-
-    createRecipientNode(member) {
-      const fragment = document.importNode(this.template.content, true);
-      const recipientElement = fragment.querySelector('.recipient');
-      recipientElement.classList.add(member.id ? 'exist' : 'not_exist');
-      const memberElement = recipientElement.querySelector('.member');
-      const img = memberElement.querySelector('img.picture_url');
-      img.src = member.picture_url || chrome.i18n.getMessage('m2');
-      img.alt = member.display_name;
-      memberElement.querySelector('.display_name').textContent = member.display_name;
-      memberElement.querySelector('.uname').textContent = member.uname;
-      const input = memberElement.querySelector('input.id');
-      input.value = member.id || '';
-      input.title = member.display_name;
-      const button = recipientElement.querySelector('button.remove');
-      button.addEventListener('click', event => {
-        recipientElement.parentNode.removeChild(recipientElement);
-      });
-      return fragment;
-    }
-
-    appendMember(...members) {
-      members.reduce((element, member) => {
-        element.appendChild(this.createRecipientNode(member))
-        return element;
-      }, this.element);
-      return this;
-    }
-  }
-
   const api = new UniposAPI({
     load: () => executeScript({
       code: "[window.localStorage.getItem('authnToken'), window.localStorage.getItem('refreshToken')]"
@@ -84,24 +15,21 @@ window.addEventListener('DOMContentLoaded', (event) => {
     })
   });
 
-  document.getElementById('card').addEventListener('reset', (event) => {
-    document.getElementById('suggest_members').textContent = '';
+  document.getElementById('send_card').addEventListener('reset', (event) => {
     document.getElementById('progress').value = 0;
     document.getElementById('status_text').textContent = '';
+    recipients.textContent = '';
 
-    for (const node of event.target.querySelectorAll('.recipients'))
-      node.textContent = '';
-
-    for (const node of event.target.querySelectorAll('input,select,textarea,button')) {
+    for (const node of event.target.querySelectorAll('fieldset#card, fieldset#buttons')) {
       node.disabled = false;
     }
   });
 
-  document.getElementById('card').addEventListener('submit', (event) => {
+  document.getElementById('send_card').addEventListener('submit', (event) => {
     event.preventDefault();
     const form = event.target;
     const data = new FormData(form);
-    for (const node of form.querySelectorAll('input,select,textarea,button')) {
+    for (const node of form.querySelectorAll('fieldset#card, fieldset#buttons')) {
       node.disabled = true;
     }
     const progress = document.getElementById('progress');
@@ -111,14 +39,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
       const from = profile.member.id;
       const point = Number(data.get('point'));
       const message = data.get('message');
-      const toList = data.getAll('to');
-      progress.max = toList.length;
-      for (const to of toList) {
+      const members = recipients.findMembers(...data.getAll('to'));
+      progress.max = members.length;
+      for (const member of members) {
         progress.value += 1;
-        if (to === '') continue;
-        const name = form.querySelector(`input[name="to"][value="${to}"]`).title;
+        if (!member.id) continue;
+        const name = member.display_name;
         statusText.textContent = chrome.i18n.getMessage('m3', name);
-        const result = await api.sendCard(from, to, point, message);
+        const result = await api.sendCard(from, member.id, point, message);
         console.debug(result);
         console.info(`Sent Unipos to ${name}`);
       }
@@ -130,92 +58,28 @@ window.addEventListener('DOMContentLoaded', (event) => {
     });
   });
 
-  const recipients = new RecipientsElement(document.querySelector('form#card .recipients'), document.getElementById('recipient'));
-
-  document.getElementById('recipients_slot').addEventListener('input', (event) => {
-    const value = event.target.value;
-    api.findSuggestMembers(value, 10)
-      .then(members => {
-        const dataList = document.getElementById('suggest_members');
-        dataList.textContent = '';
-        dataList.appendChild(
-          members
-            .map(member => {
-              const option = document.createElement('option');
-              option.value = member.uname;
-              option.textContent = `${member.display_name} ${member.uname}`
-              return option;
-            })
-            .reduce((parent, child) => {
-              parent.appendChild(child);
-              return parent;
-            }, document.createDocumentFragment())
-        );
-      })
-      .catch(console.error);
+  const recipients = document.getElementById('recipients');
+  recipients.addEventListener('change', (event) => {
+    const length = recipients.members.length;
+    document.getElementById('recipients_slot').required = length === 0;
   });
 
-  document.getElementById('recipients_slot').addEventListener('keypress', (event) => {
-    if (event.key !== 'Enter') return;
-    event.preventDefault();
-    const recipientsSlot = event.target;
-    const value = event.target.value;
-    Members.fetch(api, value)
-      .then(members => {
-        recipients.appendMember(...members);
-        recipientsSlot.value = ''
-        document.getElementById('suggest_members').textContent = '';
-      })
-      .catch(console.error);
-  });
+  document.querySelector('#point input[is="unipos-point"]').fetchAvailablePoint = async () => {
+    try {
+      const profile = await api.getProfile();
+      return profile && profile.member.pocket.available_point;
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-  document.getElementById('recipients_slot').addEventListener('blur', (event) => {
-    const recipientsSlot = event.target;
-    const value = event.target.value;
-    Members.fetch(api, value)
-      .then(members => {
-        recipients.appendMember(...members);
-        recipientsSlot.value = ''
-        document.getElementById('suggest_members').textContent = '';
-      })
-      .catch(console.error);
-  });
-
-  document.getElementById('recipients_slot').addEventListener('paste', (event) => {
-    if (event.target.value) return;
-    event.preventDefault();
-    const values = event.clipboardData.getData('text/plain').split(/[\r\n]/);
-    Members.fetch(api, ...values)
-      .then(members => {
-        recipients.appendMember(...members);
-      })
-      .catch(console.error);
-  });
-
-  (new MutationObserver((mutations) => {
-    mutations
-      .filter(mutation => mutation.type === 'childList')
-      .forEach(mutation => {
-        const length = mutation.target.querySelectorAll('.recipient').length;
-        document.getElementById('recipients_slot').required = length === 0;
-        (async () => {
-          const profile = await api.getProfile();
-          const availablePoint = profile.member.pocket.available_point;
-          document.querySelector('#point input[type="number"]').max
-            = Math.min(120, availablePoint > 1 ? Math.floor(availablePoint / length) : availablePoint);
-        })().catch(console.error);
-      });
-  })).observe(recipients.element, { childList: true })
-
-  document.querySelector('#card #message textarea[name="message"]').addEventListener('input', (event) => {
-    const textarea = event.target;
-    while (textarea.scrollHeight > textarea.offsetHeight) textarea.rows++;
-  });
+  document.getElementById('recipients_slot').findSuggestMembers
+    = (value) => api.findSuggestMembers(value, 10).catch(console.error);
 
   chrome.storage.sync.get(['options'], result => {
     const { recipientMembers = [], point = null, message = '' } = result.options || {};
-    recipients.appendMember(...(recipientMembers.map(Member.new)));
-    document.querySelector('form#card [name="point"]').value = point === null ? '' : point;
-    document.querySelector('form#card [name="message"]').value = message;
+    recipients.appendMember(...recipientMembers);
+    document.querySelector('fieldset#card [name="point"]').value = point === null ? '' : point;
+    document.querySelector('fieldset#card [name="message"]').value = message;
   });
 });
