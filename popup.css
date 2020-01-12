@@ -28,17 +28,17 @@ fieldset#card input#recipients_slot {
   line-height: 1.5em;
 }
 
-fieldset#card .recipients unipos-recipient {
+fieldset#card unipos-recipients unipos-recipient {
   padding: 0 1ex;
   margin: .2ex .1ex;
 }
 
-fieldset#card .recipients unipos-recipient:last-child {
+fieldset#card unipos-recipients unipos-recipient:last-child {
   margin-right: 1ex;
 }
 
-fieldset#card .recipients unipos-recipient unipos-member::part(id),
-fieldset#card .recipients unipos-recipient unipos-member::part(uname) {
+fieldset#card unipos-recipients unipos-recipient::part(member-id),
+fieldset#card unipos-recipients unipos-recipient::part(member-uname) {
   display: none;
 }
 

@@ -8,10 +8,6 @@ export default class UniposRecipientsElement extends HTMLElement {
     this.internals = this.attachInternals();
     this.internals.setFormValue(null);
     this.pastForm = null;
-    const document = this.ownerDocument;
-    const shadow = this.attachShadow({ mode: 'open' });
-    const template = document.getElementById('unipos-recipients');
-    shadow.appendChild(document.importNode(template.content, true));
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -22,24 +18,22 @@ export default class UniposRecipientsElement extends HTMLElement {
 
   formAssociatedCallback(form) {
     this.pastForm && this.pastForm.removeEventListener('formdata', this.formdataEventListener);
-    form.addEventListener('formdata', this.formdataEventListener);
+    form && form.addEventListener('formdata', this.formdataEventListener);
     this.pastForm = form;
   }
 
   formDisabledCallback(disabled) {
     this.disabled = disabled;
-    const slot = this.shadowRoot.querySelector('slot[name="recipients"]');
-    const elements = slot.assignedElements();
-    elements
-      .flatMap(element => [...element.querySelectorAll('unipos-recipient')])
+    this.querySelector('unipos-recipient')
       .forEach(recipient => recipient.disabled);
   }
 
   formdataEventListener = (event) => {
     if (this.disabled) return;
     const data = event.formData;
-    for (const member of this.members) {
-      data.append(this.name, member.id);
+    for (const member of this.querySelectorAll('unipos-recipient')) {
+      if (member.disabled) continue;
+      data.append(this.name, member.member.id);
     }
   }
 
@@ -56,11 +50,8 @@ export default class UniposRecipientsElement extends HTMLElement {
   }
 
   get members() {
-    const slot = this.shadowRoot.querySelector('slot[name="recipients"]');
-    const elements = slot.assignedElements();
-    return elements
-      .flatMap(element => [...element.querySelectorAll('unipos-member')])
-      .map(node => node.member);
+    return [...this.querySelectorAll('unipos-recipient')]
+      .map(recipient => recipient.member);
   }
 
   findMembers(...ids) {
@@ -68,30 +59,17 @@ export default class UniposRecipientsElement extends HTMLElement {
   }
 
   createRecipientNode(member) {
-    const document = this.ownerDocument;
-    const template = this.shadowRoot.getElementById('recipient');
-    const fragment = document.importNode(template.content, true);
-    const recipientElement = fragment.querySelector('unipos-recipient');
-    recipientElement.classList.add(member.id ? 'exist' : 'not_exist');
-    const memberElement = recipientElement.querySelector('unipos-member');
-    const img = memberElement.querySelector('img[slot="picture"]');
-    if (member.picture_url) img.src = member.picture_url;
-    img.alt = member.display_name;
-    memberElement.querySelector('[slot="display_name"]').textContent = member.display_name;
-    memberElement.querySelector('[slot="uname"]').textContent = member.uname;
-    memberElement.querySelector('[slot="id"]').textContent = member.id || '';
-    return fragment;
+    const element = this.ownerDocument.createElement('unipos-recipient');
+    element.member = member;
+    return element;
   }
 
   appendMember(...members) {
-    const slot = this.shadowRoot.querySelector('slot[name="recipients"]');
-    const elements = slot.assignedElements();
-    for (const element of elements) {
-      members.reduce((element, member) => {
-        element.appendChild(this.createRecipientNode(member))
-        return element;
-      }, element);
-    }
+    const fragment = members.reduce((element, member) => {
+      element.appendChild(this.createRecipientNode(member))
+      return element;
+    }, this.ownerDocument.createDocumentFragment());
+    this.appendChild(fragment);
     return this;
   }
 }

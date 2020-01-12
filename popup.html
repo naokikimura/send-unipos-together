@@ -11,39 +11,15 @@
   <script type="module" src="unipos/suggest-members/element.js"></script>
   <script type="module" src="unipos/recipients/element.js"></script>
   <script type="module" src="unipos/recipient/element.js"></script>
-  <script type="module" src="unipos/member/element.js"></script>
-  <template id="unipos-member">
-    <link rel="stylesheet" href="unipos/member/style.css">
-    <slot name="id" part="id">id</slot>
-    <slot name="picture" part="picture"><img src="" alt="" /></slot>
-    <slot name="display_name" part="display_name">display_name</slot>
-    <slot name="uname" part="uname">uname</slot>
-  </template>
   <template id="unipos-recipient">
     <link rel="stylesheet" href="unipos/recipient/style.css">
-    <slot name="member" part="member">
-      <unipos-member>
-        <span slot="id"></span>
-        <span slot="uname"></span>
-        <span slot="display_name"></span>
-        <img slot="picture" src="" alt="">
-      </unipos-member>
-    </slot>
-    <button id="remove">×</button>
-  </template>
-  <template id="unipos-recipients">
-    <template id="recipient">
-      <unipos-recipient>
-        <unipos-member slot="member">
-          <span slot="id"></span>
-          <span slot="uname"></span>
-          <span slot="display_name"></span>
-          <img slot="picture" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-            alt="">
-        </unipos-member>
-      </unipos-recipient>
-    </template>
-    <slot name="recipients" part="recipients"></slot>
+    <span id="member" part="member">
+      <span id="member-id" part="member-id"></span>
+      <img id="member-picture" part="member-picture" src="" alt="" />
+      <span id="member-display_name" part="member-display_name"></span>
+      <span id="member-uname" part="member-uname"></span>
+    </span>
+    <button id="remove" part="remeve">×</button>
   </template>
 </head>
 
@@ -51,9 +27,7 @@
   <form action="" method="POST" enctype="multipart/form-data" id="send_card">
     <fieldset id="card">
       <fieldset>
-        <unipos-recipients id="recipients" name="to">
-          <span slot="recipients" class="recipients"></span>
-        </unipos-recipients>
+        <unipos-recipients id="recipients" name="to"></unipos-recipients>
         <input is="unipos-suggest-members" type="search" name="recipients_slot" id="recipients_slot"
           list="suggest_members" recipients="recipients" required autofocus placeholder="宛先" />
         <datalist id="suggest_members"></datalist>

@@ -1,15 +1,22 @@
-const assignedNodes = (slot, options = { flatten: false }) => {
-  const nodes = slot.assignedNodes(options);
-  return nodes.length ? nodes : Array.from(slot.childNodes);
-};
-
-const assignedElements = (slot, options = { flatten: false }) => {
-  const elements = slot.assignedElements(options);
-  return elements.length ? elements : Array.from(slot.children);
-};
+function updateShadow(shadowRoot, { id = '', uname = '', display_name = '', picture_url }) {
+  shadowRoot.getElementById('member-id').textContent = id;
+  shadowRoot.getElementById('member-uname').textContent = uname;
+  shadowRoot.getElementById('member-display_name').textContent = display_name;
+  shadowRoot.getElementById('member-picture').setAttribute('alt', display_name);
+  shadowRoot.getElementById('member-picture').src = picture_url || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+}
 
 export default class UniposRecipientElement extends HTMLElement {
-  static get observedAttributes() { return ['disabled']; }
+  static get observedAttributes() {
+    return [
+      'data-id',
+      'data-uname',
+      'data-display_name',
+      'data-picture_url',
+      'disabled'
+    ];
+  }
+
   static get formAssociated() { return true; }
 
   constructor() {
@@ -27,7 +34,7 @@ export default class UniposRecipientElement extends HTMLElement {
 
   formAssociatedCallback(form) {
     this.pastForm && this.pastForm.removeEventListener('formdata', this.formdataEventListener);
-    form.addEventListener('formdata', this.formdataEventListener);
+    form && form.addEventListener('formdata', this.formdataEventListener);
     this.pastForm = form;
   }
 
@@ -42,9 +49,25 @@ export default class UniposRecipientElement extends HTMLElement {
     data.append(this.name, this.member.id);
   }
 
+  connectedCallback() {
+    updateShadow(this.shadowRoot, this.dataset);
+  }
+
   attributeChangedCallback(name, oldValue, newValue) {
-    if (name === 'disabled') {
-      this.disabled = newValue != null;
+    switch (name) {
+      case 'disabled':
+        this.disabled = newValue != null;
+        break;
+
+      case 'data-id':
+      case 'data-uname':
+      case 'data-display_name':
+      case 'data-picture_url':
+        updateShadow(this.shadowRoot, this.dataset);
+        break;
+
+      default:
+        break;
     }
   }
 
@@ -61,10 +84,24 @@ export default class UniposRecipientElement extends HTMLElement {
   }
 
   get member() {
-    const slot = this.shadowRoot.querySelector('slot[name="member"]');
-    const elements = assignedElements(slot)
-      .filter(element => element.tagName === 'UNIPOS-MEMBER' || element.querySelector('unipos-member'));
-    return (elements[0] || {}).member;
+    return {
+      id: this.dataset.id,
+      uname: this.dataset.uname,
+      display_name: this.dataset.display_name,
+      picture_url: this.dataset.picture_url
+    };
+  }
+
+  set member(member) {
+    for (const key of Object.keys(member)) {
+      if (!['id', 'uname', 'display_name', 'picture_url'].includes(key)) continue;
+      const value = member[key];
+      if (value === undefined) {
+        delete this.dataset[key];
+      } else {
+        this.dataset[key] = value;
+      }
+    }
   }
 }
 

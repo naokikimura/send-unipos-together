@@ -18,9 +18,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
   document.getElementById('send_card').addEventListener('reset', (event) => {
     document.getElementById('progress').value = 0;
     document.getElementById('status_text').textContent = '';
-
-    for (const node of event.target.querySelectorAll('.recipients'))
-      node.textContent = '';
+    event.target.getElementById('recipients').textContent = '';
 
     for (const node of event.target.querySelectorAll('fieldset#card, fieldset#buttons')) {
       node.disabled = false;
@@ -60,7 +58,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     });
   });
 
-  const recipients = document.querySelector('unipos-recipients');
+  const recipients = document.getElementById('recipients');
 
   document.getElementById('recipients_slot').findSuggestMembers = (value) => api.findSuggestMembers(value, 10);
 

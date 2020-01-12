@@ -8,7 +8,19 @@
   border-radius: 1em;
 }
 
-:host(.exist) {
+:host([data-id]) {
   color: #454a4a;
   border-color: #454a4a;
+}
+
+#member-picture {
+  width: 1.5em;
+}
+
+#member-uname::before {
+  content: '(@';
+}
+
+#member-uname::after {
+  content: ')';
 }
