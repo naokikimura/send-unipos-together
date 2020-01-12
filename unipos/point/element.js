@@ -39,7 +39,8 @@ export default class UniposPointElement extends HTMLInputElement {
   }
 
   get recipients() {
-    return this.ownerDocument.getElementById(this.getAttribute('recipients'));
+    const attribute = this.getAttribute('recipients');
+    return attribute ? this.ownerDocument.getElementById(attribute) : this.closest('unipos-recipients');
   }
 }
 
