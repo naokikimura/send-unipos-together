@@ -31,7 +31,7 @@ export default class UniposPointElement extends HTMLInputElement {
   }
 
   get fetchAvailablePoint() {
-    return this._fetchAvailablePoint || Promise.resolve(120);
+    return this._fetchAvailablePoint || (() => Promise.resolve(120));
   }
 
   set fetchAvailablePoint(value) {
