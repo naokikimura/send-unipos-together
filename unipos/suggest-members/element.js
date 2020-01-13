@@ -14,7 +14,7 @@ export default class UniposSuggestMembersElement extends HTMLInputElement {
     this.addEventListener('input', (event) => {
       if (!event.target.list) return;
       this.findSuggestMembers(event.target.value)
-        .then(members => {
+        .then((members = []) => {
           const dataList = event.target.list;
           if (!dataList) return;
           const document = dataList.ownerDocument;
