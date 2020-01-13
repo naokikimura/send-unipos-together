@@ -18,7 +18,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
   document.getElementById('send_card').addEventListener('reset', (event) => {
     document.getElementById('progress').value = 0;
     document.getElementById('status_text').textContent = '';
-    recipients.textContent = '';
 
     for (const node of event.target.querySelectorAll('fieldset#card, fieldset#buttons')) {
       node.disabled = false;
@@ -59,22 +58,21 @@ window.addEventListener('DOMContentLoaded', (event) => {
   });
 
   const recipients = document.getElementById('recipients');
-  recipients.addEventListener('change', (event) => {
-    const length = recipients.members.length;
-    document.getElementById('recipients_slot').required = length === 0;
-  });
 
-  document.querySelector('#point input[is="unipos-point"]').fetchAvailablePoint = async () => {
-    try {
-      const profile = await api.getProfile();
-      return profile && profile.member.pocket.available_point;
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  for (const point of document.querySelectorAll('input[is="unipos-point"]')) {
+    point.fetchAvailablePoint = async () => {
+      try {
+        const profile = await api.getProfile();
+        return profile && profile.member.pocket.available_point;
+      } catch (error) {
+        console.error(error);
+      }
+    };
+  }
 
-  document.getElementById('recipients_slot').findSuggestMembers
-    = (value) => api.findSuggestMembers(value, 10).catch(console.error);
+  for (const suggestMembers of document.querySelectorAll('input[is="unipos-suggest-members"]')) {
+    suggestMembers.findSuggestMembers = (value) => api.findSuggestMembers(value, 10).catch(console.error);
+  }
 
   chrome.storage.sync.get(['options'], result => {
     const { recipientMembers = [], point = null, message = '' } = result.options || {};

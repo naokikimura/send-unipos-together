@@ -29,16 +29,21 @@
     </span>
     <button id="remove" part="remeve">×</button>
   </template>
+  <template id="unipos-recipients">
+    <slot name="recipients" part="recipients"></slot>
+    <slot name="input" part="input"></slot>
+  </template>
 </head>
 
 <body>
   <form action="" method="POST" enctype="multipart/form-data" id="send_card">
     <fieldset id="card">
       <fieldset>
-        <unipos-recipients id="recipients" name="to"></unipos-recipients>
-        <input is="unipos-suggest-members" type="search" name="recipients_slot" id="recipients_slot"
-          list="suggest_members" recipients="recipients" required autofocus placeholder="宛先" />
-        <datalist id="suggest_members"></datalist>
+        <unipos-recipients id="recipients" name="to" required>
+          <input is="unipos-suggest-members" slot="input" type="search" list="suggest_members" autofocus
+            placeholder="宛先" />
+          <datalist id="suggest_members"></datalist>
+        </unipos-recipients>
       </fieldset>
       <span id="point">
         <input is="unipos-point" type="number" name="point" min="0" max="120" recipients="recipients" required

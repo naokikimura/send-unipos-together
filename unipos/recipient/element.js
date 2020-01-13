@@ -28,7 +28,7 @@ export default class UniposRecipientElement extends HTMLElement {
     const template = document.getElementById('unipos-recipient');
     shadow.appendChild(document.importNode(template.content, true));
     shadow.getElementById('remove').addEventListener('click', (event) => {
-      this.parentNode.removeChild(this);
+      this.remove();
     });
   }
 
@@ -56,7 +56,7 @@ export default class UniposRecipientElement extends HTMLElement {
   attributeChangedCallback(name, oldValue, newValue) {
     switch (name) {
       case 'disabled':
-        this.disabled = newValue != null;
+        this.disabled = newValue !== null;
         break;
 
       case 'data-id':
@@ -81,6 +81,14 @@ export default class UniposRecipientElement extends HTMLElement {
 
   set name(value) {
     this.setAttribute('name');
+  }
+
+  get disabled() {
+    return !!this._disabled;
+  }
+
+  set disabled(value) {
+    this._disabled = !!value;
   }
 
   get member() {

@@ -24,7 +24,7 @@ fieldset#card {
   margin-bottom: 1ex;
 }
 
-fieldset#card input#recipients_slot {
+fieldset#card input[is="unipos-suggest-members"] {
   line-height: 1.5em;
 }
 
@@ -51,15 +51,16 @@ fieldset#card #point::before {
   content: '+';
 }
 
-fieldset#card #point input[name="point"] {
+fieldset#card #point input[is="unipos-point"] {
   width: 5em;
 }
 
-fieldset#card #message textarea[name="message"] {
+fieldset#card #message textarea[is="unipos-message"] {
   width: 100%;
 }
 
-form#send_card button[type="submit"] {
+form#send_card button {
+  margin-right: .5ex;
   padding: .5ex 1ex;
   background-color: #55cbe1;
   border-radius: 2px;
