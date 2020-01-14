@@ -12,6 +12,7 @@
         "default_popup": "popup.html"
     },
     "permissions": [
+        "https://unipos.me/*",
         "storage",
         "activeTab",
         "declarativeContent"
