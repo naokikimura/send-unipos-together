@@ -12,6 +12,7 @@
   <script type="module" src="unipos/suggest-members/element.js"></script>
   <script type="module" src="unipos/recipients/element.js"></script>
   <script type="module" src="unipos/recipient/element.js"></script>
+  <script type="module" src="unipos/card-form/element.js"></script>
   <template id="unipos-recipient">
     <style>
       @import url("unipos/recipient/style.css");
@@ -36,7 +37,7 @@
 </head>
 
 <body>
-  <form action="" method="POST" enctype="multipart/form-data" id="send_card">
+  <form is="unipos-card-form" action="" method="POST" enctype="multipart/form-data" id="send_card">
     <fieldset id="card">
       <fieldset>
         <unipos-recipients id="recipients" name="to" required>
