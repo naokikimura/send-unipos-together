@@ -1,74 +1,11 @@
 import UniposAPI from './unipos/api.js';
 
-const newRejectedPromise = (errorConstructor, message) => Promise.reject(new errorConstructor(message));
-
-function promisify(original, makeCallback) {
-  function defaultMakeCallback(resolve, reject) {
-    return function callback(error, result) {
-      if (error)
-        reject(error);
-      else
-        resolve(result);
-    }
-  }
-  return function (...args) {
-    const that = this;
-    return new Promise(function executor(resolve, reject) {
-      original.apply(that, args.concat((makeCallback || defaultMakeCallback)(resolve, reject)));
-    });
-  };
-}
-
-const makeCallback = function (resolve, reject) {
-  return function callback(...args) {
-    const [results] = args;
-    const error = chrome.runtime.lastError;
-    if (error)
-      reject(error);
-    else
-      resolve(results);
-  };
-};
-
-const storageArea = ((global, storageType) => {
-  if (global.hasOwnProperty('browser')) {
-    return global.browser.storage[storageType];
-  } else if (global.hasOwnProperty('chrome')) {
-    const storageArea = global.chrome.storage[storageType];
-    return new class StorageArea {
-      get(keys) { return promisify(storageArea.get.bind(storageArea), makeCallback)(keys); }
-      getBytesInUse(keys) { return promisify(storageArea.getBytesInUse.bind(storageArea), makeCallback)(keys); }
-      set(keys) { return promisify(storageArea.set.bind(storageArea), makeCallback)(keys); }
-      remove(keys) { return promisify(storageArea.remove.bind(storageArea))(keys); }
-      clear() { return promisify(storageArea.clear.bind(storageArea), makeCallback)(); }
-    }();
-  } else {
-    const reject = () => newRejectedPromise(ReferenceError, 'browser or chrome is not defined');
-    return new class {
-      get(keys) { return reject(); }
-      getBytesInUse(keys) { return reject(); }
-      set(keys) { return reject(); }
-      remove(keys) { return reject(); }
-      clear() { return reject(); }
-    }();
-  }
-})(window, 'sync');
-
-function executeScriptAsync(...args) {
-  if (window.hasOwnProperty('browser'))
-    return browser.tabs.executeScript(...args);
-  else if (window.hasOwnProperty('chrome'))
-    return promisify(chrome.tabs.executeScript.bind(chrome.tabs), makeCallback)(...args);
-  else
-    return newRejectedPromise(ReferenceError, 'browser or chrome is not defined');
-};
-
 const api = new UniposAPI({
-  load: () => executeScriptAsync({
+  load: () => browser.tabs.executeScript({
     code: "[window.localStorage.getItem('authnToken'), window.localStorage.getItem('refreshToken')]"
   }).then(results => results[0]),
 
-  save: (authnToken, refreshToken) => executeScriptAsync({
+  save: (authnToken, refreshToken) => browser.tabs.executeScript({
     code: `window.localStorage.setItem('authnToken', '${authnToken}'); window.localStorage.setItem('refreshToken', '${refreshToken}');`
   })
 });
@@ -118,12 +55,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
     });
 
     form.addEventListener('cardsubmitted', (event) => {
-      window.alert(chrome.i18n.getMessage('m1'));
+      window.alert(browser.i18n.getMessage('m1'));
       form.reset();
     });
 
     form.addEventListener('cardsubmittingerror', (event) => {
-      window.alert(chrome.i18n.getMessage('m4'));
+      window.alert(browser.i18n.getMessage('m4'));
       console.error(error);
     });
 
@@ -131,7 +68,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
       const to = event.detail.to;
       progress.value += 1;
       if (!to.id) return event.preventDefault();
-      statusText.textContent = chrome.i18n.getMessage('m3', to.display_name);
+      statusText.textContent = browser.i18n.getMessage('m3', to.display_name);
     });
 
     form.addEventListener('sendingerror', (event) => {
@@ -146,7 +83,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     });
   }
 
-  storageArea.get(['options']).then(result => {
+  browser.storage.sync.get(['options']).then(result => {
     const { recipientMembers = [], point = null, message = '' } = result.options || {};
     recipients.appendMember(...recipientMembers);
     document.querySelector('fieldset#card [name="point"]').value = point === null ? '' : point;
