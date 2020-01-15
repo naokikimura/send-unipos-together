@@ -1,0 +1,32 @@
+{
+  "name": "send-unipos-together",
+  "version": "0.0.9",
+  "description": "This extension allows you to send Unipos to multiple destinations at once.",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc; sass src/:built/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/naokikimura/send-unipos-together.git"
+  },
+  "keywords": [
+    "Unipos",
+    "WebExtensions"
+  ],
+  "author": "Naoki Kimura",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/naokikimura/send-unipos-together/issues"
+  },
+  "homepage": "https://github.com/naokikimura/send-unipos-together#readme",
+  "devDependencies": {
+    "sass": "^1.24.4",
+    "tslint": "^5.20.1",
+    "typescript": "^3.7.4"
+  },
+  "dependencies": {
+    "@types/chrome": "0.0.91",
+    "@types/firefox-webext-browser": "^70.0.1"
+  }
+}

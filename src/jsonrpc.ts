@@ -1,5 +1,5 @@
 export default class JSONRPC {
-  static async call(url, method, params, configure = (request) => request) {
+  static async call<T>(url: string, method: string, params: any, configure = (request: Request) => request) {
     const request = new Request(url, {
       "headers": {
         "accept": "application/json",
@@ -17,12 +17,14 @@ export default class JSONRPC {
     const body = await res.json();
     if (body.error)
       throw new class JSONRPCError extends Error {
-        constructor(error) {
+        code: number;
+        data: any;
+        constructor(error: { message: string, code: number, data: any }) {
           super(error.message);
           this.code = error.code;
           this.data = error.data;
         }
       }(body.error);
-    return body.result;
+    return body.result as T;
   }
 }

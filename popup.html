@@ -5,18 +5,18 @@
 <head>
   <meta charset="UTF-8" />
   <title>Send Unipos together</title>
-  <link rel="stylesheet" type="text/css" href="popup.css">
+  <link rel="stylesheet" type="text/css" href="built/popup.css">
   <script type="module" src="https://unpkg.com/webextension-polyfill/dist/browser-polyfill.min.js"></script>
-  <script type="module" src="popup.js"></script>
-  <script type="module" src="unipos/point/element.js"></script>
-  <script type="module" src="unipos/message/element.js"></script>
-  <script type="module" src="unipos/suggest-members/element.js"></script>
-  <script type="module" src="unipos/recipients/element.js"></script>
-  <script type="module" src="unipos/recipient/element.js"></script>
-  <script type="module" src="unipos/card-form/element.js"></script>
+  <script type="module" src="built/popup.js"></script>
+  <script type="module" src="built/unipos/point/element.js"></script>
+  <script type="module" src="built/unipos/message/element.js"></script>
+  <script type="module" src="built/unipos/suggest-members/element.js"></script>
+  <script type="module" src="built/unipos/recipients/element.js"></script>
+  <script type="module" src="built/unipos/recipient/element.js"></script>
+  <script type="module" src="built/unipos/card-form/element.js"></script>
   <template id="unipos-recipient">
     <style>
-      @import url("unipos/recipient/style.css");
+      @import url("built/unipos/recipient/style.css");
 
       /* Hack to eliminate flicker */
       img {
