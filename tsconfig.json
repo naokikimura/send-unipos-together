@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "outDir": "./built",
-    "allowJs": true,
     "target": "ES2019",
     "strictBindCallApply": true,
     "sourceMap": true
