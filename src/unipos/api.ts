@@ -2,8 +2,8 @@ import JSONRPC from '../jsonrpc.js';
 import { UniposMember, UniposProfile } from './index';
 
 interface TokenStore {
-  load(): Promise<[string, string]>;
-  save(authnToken: string, refreshToken: string): Promise<void>;
+  load(): [string, string] | Promise<[string, string]>;
+  save(authnToken: string, refreshToken: string): void | Promise<void>;
 }
 
 interface RefreshTokenResult {
@@ -20,6 +20,11 @@ interface SendCardResult {
   id: string;
 }
 
+const defaultTokenStore = {
+  load: async () => [undefined, undefined] as [string, string],
+  save: async (authnToken: string, refreshToken: string) => { },
+};
+
 export default class UniposAPI {
   public static async refreshToken(authnToken: string, refreshToken: string) {
     return JSONRPC.call<RefreshTokenResult>(
@@ -28,7 +33,7 @@ export default class UniposAPI {
 
   private tokenStore: TokenStore;
 
-  constructor(tokenStore: TokenStore = { load: async () => [undefined, undefined], save: async (authnToken: string, refreshToken: string) => { } }) {
+  constructor(tokenStore: TokenStore = defaultTokenStore) {
     this.tokenStore = tokenStore;
   }
 

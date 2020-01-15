@@ -7,7 +7,7 @@ import UniposSuggestMembersElement from './unipos/suggest-members/element.js';
 const api = new UniposAPI({
   load: () => browser.tabs.executeScript({
     code: `[window.localStorage.getItem('authnToken'), window.localStorage.getItem('refreshToken')]`,
-  }).then(results => results[0]),
+  }).then(results => (results[0] as [string, string])),
 
   save: (authnToken, refreshToken) => browser.tabs.executeScript({
     code: `window.localStorage.setItem('authnToken', '${authnToken}'); window.localStorage.setItem('refreshToken', '${refreshToken}');`,
@@ -32,8 +32,11 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   for (const suggestMembers of document.querySelectorAll<UniposSuggestMembersElement>('input[is="unipos-suggest-members"]')) {
-    suggestMembers.findSuggestMembers
-      = value => api.findSuggestMembers(value, 10).catch(reason => { console.error(reason); return []; });
+    suggestMembers.findSuggestMembers = value => api.findSuggestMembers(value, 10)
+      .catch(reason => {
+        console.error(reason);
+        return [];
+      });
   }
 
   for (const form of document.querySelectorAll<UniposCardFormElement>('form[is="unipos-card-form"]')) {
