@@ -21,11 +21,13 @@
   "homepage": "https://github.com/naokikimura/send-unipos-together#readme",
   "devDependencies": {
     "gulp": "^4.0.2",
+    "gulp-ignore": "^3.0.0",
     "gulp-sass": "^4.0.2",
     "gulp-sourcemaps": "^2.6.5",
     "gulp-stylelint": "^11.0.0",
     "gulp-tslint": "^8.1.4",
     "gulp-typescript": "^6.0.0-alpha.1",
+    "gulp-zip": "^5.0.1",
     "sass": "^1.24.4",
     "stylelint-config-recommended": "^3.0.0",
     "tslint": "^5.20.1",
