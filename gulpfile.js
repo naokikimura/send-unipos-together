@@ -40,9 +40,7 @@ exports.test = () => {
 
 }
 
-exports.build = () => {
-
-}
+exports.build = gulp.series(exports.lint, exports.transpile);
 
 exports.package = () => {
 
