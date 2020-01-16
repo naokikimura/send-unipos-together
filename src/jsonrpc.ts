@@ -1,30 +1,32 @@
 export default class JSONRPC {
-  static async call<T>(url: string, method: string, params: any, configure = (request: Request) => request) {
+  public static async call<T>(url: string, method: string, params: any, configure = (req: Request) => req) {
     const request = new Request(url, {
-      "headers": {
-        "accept": "application/json",
-        "content-type": "application/json",
-      },
-      "body": JSON.stringify({
-        "jsonrpc": "2.0",
-        "method": method,
-        "params": params,
-        "id": String(new Date().getTime() * 1000 + Math.floor(Math.random() * 1000))
+      body: JSON.stringify({
+        id: String(new Date().getTime() * 1000 + Math.floor(Math.random() * 1000)),
+        jsonrpc: '2.0',
+        method,
+        params,
       }),
-      "method": "POST"
+      headers: {
+        'accept': 'application/json',
+        'content-type': 'application/json',
+      },
+      method: 'POST',
     });
     const res = await fetch(configure(request));
     const body = await res.json();
-    if (body.error)
-      throw new class JSONRPCError extends Error {
-        code: number;
-        data: any;
-        constructor(error: { message: string, code: number, data: any }) {
-          super(error.message);
-          this.code = error.code;
-          this.data = error.data;
-        }
-      }(body.error);
+    if (body.error) throw new JSONRPCError(body.error);
     return body.result as T;
+  }
+}
+
+export class JSONRPCError extends Error {
+  public readonly code: number;
+  public readonly data: any;
+
+  constructor(error: { message: string, code: number, data: any }) {
+    super(error.message);
+    this.code = error.code;
+    this.data = error.data;
   }
 }
