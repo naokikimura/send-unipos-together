@@ -43,7 +43,7 @@ exports['lint:stylelint'] = function stylelint() {
 
 exports.lint = gulp.parallel(exports['lint:tslint'], exports['lint:stylelint']);
 
-exports.test = () => {
+exports.test = function test() {
 
 }
 
@@ -54,11 +54,15 @@ exports.package = () => {
   return gulp.src('./**/*')
     .pipe(ignore([
       '.*',
+      'coverage',
+      'coverage/**/*',
       'gulpfile.js',
       'node_modules',
       'node_modules/**/*',
       'package{,-lock}.json',
       'stylelint.config.js',
+      'test',
+      'test/**/*',
       'tsconfig.json',
       'tslint.json',
     ]))
