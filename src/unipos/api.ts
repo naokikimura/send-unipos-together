@@ -1,4 +1,4 @@
-import JSONRPC from '../jsonrpc.js';
+import JSONRPC, { JSONRPCError } from '../jsonrpc.js';
 import { UniposMember, UniposProfile } from './index';
 
 interface TokenStore {
@@ -48,7 +48,7 @@ export default class UniposAPI {
     try {
       return await call(authnToken);
     } catch (error) {
-      if (error.code !== -40000) throw error;
+      if (!(error instanceof JSONRPCError) || error.code !== -40000) throw error;
       const result = await UniposAPI.refreshToken(authnToken, refreshToken);
       await this.tokenStore.save(result.authn_token, result.refresh_token);
       return await call(result.authn_token);
