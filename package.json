@@ -4,7 +4,7 @@
   "description": "This extension allows you to send Unipos to multiple destinations at once.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc; sass src/:built/"
+    "build": "tsc; sass src/:dist/"
   },
   "repository": {
     "type": "git",

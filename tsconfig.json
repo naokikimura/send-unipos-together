@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "./built",
+    "outDir": "./dist",
     "target": "ES2019",
     "strictBindCallApply": true,
     "sourceMap": true
