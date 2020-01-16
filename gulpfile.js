@@ -79,3 +79,5 @@ exports['watch:sass'] = function watchSass() {
 }
 
 exports.watch = gulp.parallel(exports['watch:tsc'], exports['watch:sass']);
+
+exports.default = exports.build;
