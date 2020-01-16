@@ -27,7 +27,6 @@
     "gulp-tslint": "^8.1.4",
     "gulp-typescript": "^6.0.0-alpha.1",
     "sass": "^1.24.4",
-    "stylelint": "^13.0.0",
     "stylelint-config-recommended": "^3.0.0",
     "tslint": "^5.20.1",
     "typescript": "^3.7.4"
