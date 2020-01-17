@@ -107,5 +107,5 @@ dist
 .vscode-test
 
 .vscode/
-
 *.zip
+client_secret_*.json

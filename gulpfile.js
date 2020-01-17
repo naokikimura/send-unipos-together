@@ -76,7 +76,9 @@ exports.package = () => {
   const zip = require('gulp-zip');
   return gulp.src('./**/*')
     .pipe(ignore([
+      '*.zip',
       '.*',
+      'client_secret_*.json',
       'coverage',
       'coverage/**/*',
       'gulpfile.js',
