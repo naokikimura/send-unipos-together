@@ -43,36 +43,37 @@ exports['lint:stylelint'] = function stylelint() {
 
 exports.lint = gulp.parallel(exports['lint:tslint'], exports['lint:stylelint']);
 
-exports.test = function test() {
-  function mocha(options) {
-    const stream = require('stream');
-    const Mocha = require('mocha');
-    const MochaOptions = require('mocha/lib/cli/options');
-    const mochaOptions = typeof options === 'object' ? options : MochaOptions.loadOptions(options);
-    (Array.isArray(mochaOptions.require) ? mochaOptions.require : [mochaOptions.require]).filter(id => id).forEach(require);
-    const mocha = new Mocha(mochaOptions);
-    return new stream.Transform({
-      objectMode: true,
-      transform(file, encoding, callback) {
-        mocha.addFile(file.path);
-        this.push(file);
-        callback();
-      },
-      final(callback) {
-        mocha.run(function (failures) {
-          callback();
-        });
-      }
-    });
-  }
-
+exports['test:mocha'] = function mocha() {
+  const mocha = require('./gulp-mocha');
   return gulp.src('./test/**/*.spec.{j,t}s')
     .pipe(mocha());
 }
 
-exports.build = gulp.series(exports.lint, exports.transpile);
+exports.test = gulp.parallel(exports['test:mocha']);
 
-exports.package = () => {
+exports.assemble = function assemble() {
+  const dependencies = ((folder, package, packageLock, excludes) => {
+    const path = require('path');
+    const mapper = Array.prototype.flatMap;
+    function resolver(dictionary, mapper = Array.prototype.map) {
+      return function resolve(name) {
+        const module = dictionary[name];
+        const requires = module && module.requires && Object.keys(module.requires);
+        return [name].concat(requires ? mapper.call(requires, resolve) : []);
+      }
+    }
+    return mapper.call(Object.keys(package.dependencies), resolver(packageLock.dependencies, mapper))
+      .filter(excludes)
+      .map(name => path.join(folder, name, '**/*'))
+      .concat(folder);
+  })('node_modules', require('./package.json'), require('./package-lock.json'), name => !/^@types\//.test(name));
+  return gulp.src(dependencies, { base: 'node_modules'})
+    .pipe(gulp.dest('dist'));
+}
+
+exports.build = gulp.parallel(exports.transpile, exports.assemble);
+
+exports['package:zip'] = function zip() {
   const zip = require('gulp-zip');
   return gulp.src('./**/*')
     .pipe(ignore([
@@ -95,18 +96,35 @@ exports.package = () => {
     .pipe(gulp.dest('.'));
 }
 
-exports.publish = () => {
+exports.package = gulp.series(exports.build, exports['package:zip']);
 
+const webstore = require('./gulp-chrome-web-store')(
+  'pgpnkghddnfoopjapnlklllpjknnibkn',
+  process.env.CHROME_WEB_STORE_API_CREDENTIAL,
+  process.env.CHROME_WEB_STORE_API_ACCESS_TOKEN_RESPONSE,
+);
+
+exports.publish = function publish() {
+  return webstore.publish();
 }
 
-exports['watch:tsc'] = function watchTsc() {
-  return gulp.watch(sources.typescript, exports['transpile:tsc']);
+exports['deploy:upload'] = function upload() {
+  return gulp.src(`${package.name}-${package.version}.zip`)
+    .pipe(webstore.upload());
 }
 
-exports['watch:sass'] = function watchSass() {
-  return gulp.watch(sources.scss, exports['transpile:sass']);
+exports.deploy = gulp.series(exports.package, exports['deploy:upload']);
+
+exports['watch:typescript'] = function watchTypeScript() {
+  const task = gulp.parallel(exports['transpile:tsc'], exports['lint:tslint']);
+  return gulp.watch(sources.typescript, task);
 }
 
-exports.watch = gulp.parallel(exports['watch:tsc'], exports['watch:sass']);
+exports['watch:scss'] = function watchSCSS() {
+  const task = gulp.parallel(exports['transpile:sass'], exports['lint:stylelint']);
+  return gulp.watch(sources.scss, task);
+}
+
+exports.watch = gulp.parallel(exports['watch:typescript'], exports['watch:scss']);
 
 exports.default = exports.build;

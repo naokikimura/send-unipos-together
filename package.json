@@ -41,6 +41,8 @@
   },
   "dependencies": {
     "@types/chrome": "0.0.91",
-    "@types/firefox-webext-browser": "^70.0.1"
+    "@types/firefox-webext-browser": "^70.0.1",
+    "ress": "^2.0.4",
+    "webextension-polyfill": "^0.6.0"
   }
 }
