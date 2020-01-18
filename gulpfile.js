@@ -1,6 +1,7 @@
 const gulp = require('gulp');
-const sourcemaps = require('gulp-sourcemaps');
 const package = require('./package.json');
+
+const sourcemaps = true;
 
 const sources = {
   typescript: 'src/**/*.{j,t}s{,x}',
@@ -9,20 +10,16 @@ const sources = {
 
 exports['transpile:tsc'] = function tsc() {
   const ts = require('gulp-typescript');
-  return gulp.src(sources.typescript)
-    .pipe(sourcemaps.init())
+  return gulp.src(sources.typescript, { sourcemaps })
     .pipe(ts.createProject('tsconfig.json')())
-    .pipe(sourcemaps.write())
-    .pipe(gulp.dest('dist'));
+    .pipe(gulp.dest('dist', { sourcemaps } ));
 }
 
 exports['transpile:sass'] = function sass() {
   const sass = require('gulp-sass');
-  return gulp.src(sources.scss)
-    .pipe(sourcemaps.init())
+  return gulp.src(sources.scss, { sourcemaps })
     .pipe(sass().on('error', sass.logError))
-    .pipe(sourcemaps.write())
-    .pipe(gulp.dest('dist'));
+    .pipe(gulp.dest('dist', { sourcemaps }));
 }
 
 exports.transpile = gulp.parallel(exports['transpile:sass'], exports['transpile:tsc']);
