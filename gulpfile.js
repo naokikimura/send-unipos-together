@@ -1,5 +1,4 @@
 const gulp = require('gulp');
-const ignore = require('gulp-ignore');
 const sourcemaps = require('gulp-sourcemaps');
 const package = require('./package.json');
 
@@ -52,22 +51,8 @@ exports['test:mocha'] = function mocha() {
 exports.test = gulp.parallel(exports['test:mocha']);
 
 exports.assemble = function assemble() {
-  const dependencies = ((folder, package, packageLock, excludes) => {
-    const path = require('path');
-    const mapper = Array.prototype.flatMap;
-    function resolver(dictionary, mapper = Array.prototype.map) {
-      return function resolve(name) {
-        const module = dictionary[name];
-        const requires = module && module.requires && Object.keys(module.requires);
-        return [name].concat(requires ? mapper.call(requires, resolve) : []);
-      }
-    }
-    return mapper.call(Object.keys(package.dependencies), resolver(packageLock.dependencies, mapper))
-      .filter(excludes)
-      .map(name => path.join(folder, name, '**/*'))
-      .concat(folder);
-  })('node_modules', require('./package.json'), require('./package-lock.json'), name => !/^@types\//.test(name));
-  return gulp.src(dependencies, { base: 'node_modules'})
+  const dependencies = require('./gulp-dependencies');
+  return dependencies({ excludes: name => !/^@types\//.test(name) })
     .pipe(gulp.dest('dist'));
 }
 
@@ -75,23 +60,23 @@ exports.build = gulp.parallel(exports.transpile, exports.assemble);
 
 exports['package:zip'] = function zip() {
   const zip = require('gulp-zip');
-  return gulp.src('./**/*')
-    .pipe(ignore([
-      '*.zip',
-      '.*',
-      'client_secret_*.json',
-      'coverage',
-      'coverage/**/*',
-      'gulpfile.js',
-      'node_modules',
-      'node_modules/**/*',
-      'package{,-lock}.json',
-      'stylelint.config.js',
-      'test',
-      'test/**/*',
-      'tsconfig.json',
-      'tslint.json',
-    ]))
+  const ignore = [
+    '*.zip',
+    '.*',
+    'client_secret_*.json',
+    'coverage',
+    'coverage/**/*',
+    'gulpfile.js',
+    'node_modules',
+    'node_modules/**/*',
+    'package{,-lock}.json',
+    'stylelint.config.js',
+    'test',
+    'test/**/*',
+    'tsconfig.json',
+    'tslint.json',
+  ];
+  return gulp.src('./**/*', { ignore })
     .pipe(zip(`${package.name}-${package.version}.zip`))
     .pipe(gulp.dest('.'));
 }
