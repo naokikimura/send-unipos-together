@@ -40,7 +40,7 @@ exports['lint:stylelint'] = function stylelint() {
 exports.lint = gulp.parallel(exports['lint:tslint'], exports['lint:stylelint']);
 
 exports['test:mocha'] = function mocha() {
-  const mocha = require('./gulp-mocha');
+  const mocha = require('gulp-mocha-thin');
   return gulp.src('./test/**/*.spec.{j,t}s')
     .pipe(mocha());
 }
@@ -48,7 +48,7 @@ exports['test:mocha'] = function mocha() {
 exports.test = gulp.parallel(exports['test:mocha']);
 
 exports.assemble = function assemble() {
-  const dependencies = require('./gulp-dependencies');
+  const dependencies = require('gulp-package-dependencies');
   return dependencies({ excludes: name => !/^@types\//.test(name) })
     .pipe(gulp.dest('dist'));
 }
@@ -80,7 +80,7 @@ exports['package:zip'] = function zip() {
 
 exports.package = gulp.series(exports.build, exports['package:zip']);
 
-const webstore = require('./gulp-chrome-web-store')(
+const webstore = require('gulp-chrome-web-store')(
   'pgpnkghddnfoopjapnlklllpjknnibkn',
   process.env.CHROME_WEB_STORE_API_CREDENTIAL,
   process.env.CHROME_WEB_STORE_API_ACCESS_TOKEN_RESPONSE,
