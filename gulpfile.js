@@ -22,8 +22,6 @@ exports['transpile:sass'] = function sass() {
     .pipe(gulp.dest('dist', { sourcemaps }));
 }
 
-exports.transpile = gulp.parallel(exports['transpile:sass'], exports['transpile:tsc']);
-
 exports['lint:tslint'] = function tslint() {
   const tslint = require("gulp-tslint");
   return gulp.src(sources.typescript)
@@ -37,23 +35,17 @@ exports['lint:stylelint'] = function stylelint() {
     .pipe(stylelint());
 }
 
-exports.lint = gulp.parallel(exports['lint:tslint'], exports['lint:stylelint']);
-
 exports['test:mocha'] = function mocha() {
   const mocha = require('gulp-mocha-thin');
   return gulp.src('./test/**/*.spec.{j,t}s')
     .pipe(mocha());
 }
 
-exports.test = gulp.parallel(exports['test:mocha']);
-
 exports.assemble = function assemble() {
   const dependencies = require('gulp-package-dependencies');
   return dependencies({ excludes: name => !/^@types\//.test(name) })
     .pipe(gulp.dest('dist'));
 }
-
-exports.build = gulp.parallel(exports.transpile, exports.assemble);
 
 exports['package:zip'] = function zip() {
   const zip = require('gulp-zip');
@@ -78,8 +70,6 @@ exports['package:zip'] = function zip() {
     .pipe(gulp.dest('.'));
 }
 
-exports.package = gulp.series(exports.build, exports['package:zip']);
-
 const webstore = require('gulp-chrome-web-store')(
   'pgpnkghddnfoopjapnlklllpjknnibkn',
   process.env.CHROME_WEB_STORE_API_CREDENTIAL,
@@ -95,8 +85,6 @@ exports['deploy:upload'] = function upload() {
     .pipe(webstore.upload());
 }
 
-exports.deploy = gulp.series(exports.package, exports['deploy:upload']);
-
 exports['watch:typescript'] = function watchTypeScript() {
   const task = gulp.parallel(exports['transpile:tsc'], exports['lint:tslint']);
   return gulp.watch(sources.typescript, task);
@@ -107,6 +95,11 @@ exports['watch:scss'] = function watchSCSS() {
   return gulp.watch(sources.scss, task);
 }
 
+exports.lint = gulp.parallel(exports['lint:tslint'], exports['lint:stylelint']);
+exports.transpile = gulp.parallel(exports['transpile:sass'], exports['transpile:tsc']);
+exports.build = gulp.parallel(exports.transpile, exports.assemble);
+exports.test = gulp.series(exports.build, exports['test:mocha']);
+exports.package = gulp.series(exports.build, exports['package:zip']);
+exports.deploy = gulp.series(exports.package, exports['deploy:upload']);
 exports.watch = gulp.parallel(exports['watch:typescript'], exports['watch:scss']);
-
 exports.default = exports.build;
