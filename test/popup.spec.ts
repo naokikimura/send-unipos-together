@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import * as puppeteer from 'puppeteer';
 
-(Boolean(process.env.TRAVIS) ? describe.skip : describe)('popup', () => {
+(Boolean(process.env.TRAVIS) || Boolean(process.env.CIRCLECI) ? describe.skip : describe)('popup', () => {
   before(async function before() {
     this.timeout(5000);
     const extensionPath = process.cwd();
@@ -13,7 +13,6 @@ import * as puppeteer from 'puppeteer';
       headless: false,
     });
     this.browser = browser;
-    console.debug('The browser has launched.');
 
     const extensionPage = await browser.newPage();
     const extensionPopupHtml = 'popup.html';
@@ -24,7 +23,6 @@ import * as puppeteer from 'puppeteer';
     })(await browser.targets());
     await extensionPage.goto(`chrome-extension://${extensionID}/${extensionPopupHtml}`);
     this.extensionPage = extensionPage;
-    console.debug('The extension　page has been opened.');
   });
 
   after(async function after() {
