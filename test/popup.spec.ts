@@ -13,6 +13,7 @@ import * as puppeteer from 'puppeteer';
       headless: false,
     });
     this.browser = browser;
+    console.debug('The browser has launched.');
 
     const extensionPage = await browser.newPage();
     const extensionPopupHtml = 'popup.html';
@@ -23,6 +24,7 @@ import * as puppeteer from 'puppeteer';
     })(await browser.targets());
     await extensionPage.goto(`chrome-extension://${extensionID}/${extensionPopupHtml}`);
     this.extensionPage = extensionPage;
+    console.debug('The extension　page has been opened.');
   });
 
   after(async function after() {
