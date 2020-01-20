@@ -6,6 +6,11 @@
   border-radius: 1em;
 }
 
+:host(:disabled),
+:host([disabled]) {
+  opacity: 0.5;
+}
+
 :host([data-id]) {
   color: #454a4a;
   border-color: #454a4a;

@@ -16,14 +16,11 @@ export default class UniposRecipientElement extends HTMLElement {
       'data-uname',
       'data-display_name',
       'data-picture_url',
-      'disabled',
     ];
   }
 
   static get formAssociated() { return true; }
 
-  private _disabled = false;
-  private pastForm: HTMLFormElement = null;
   private internals: any /* ElementInternals */; // TODO:
 
   constructor() {
@@ -38,13 +35,10 @@ export default class UniposRecipientElement extends HTMLElement {
   }
 
   public formAssociatedCallback(form: HTMLFormElement) {
-    this.pastForm && this.pastForm.removeEventListener('formdata', this.formdataEventListener);
-    form && form.addEventListener('formdata', this.formdataEventListener);
-    this.pastForm = form;
+    this.internals.setFormValue(this.member.id);
   }
 
   public formDisabledCallback(disabled: boolean) {
-    this.disabled = disabled;
     const button = this.shadowRoot.getElementById('remove') as HTMLButtonElement;
     button.disabled = disabled;
   }
@@ -55,11 +49,8 @@ export default class UniposRecipientElement extends HTMLElement {
 
   public attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null) {
     switch (name) {
-      case 'disabled':
-        this.disabled = newValue !== null;
-        break;
-
       case 'data-id':
+        this.internals.setFormValue(this.member.id);
       case 'data-uname':
       case 'data-display_name':
       case 'data-picture_url':
@@ -69,12 +60,6 @@ export default class UniposRecipientElement extends HTMLElement {
       default:
         break;
     }
-  }
-
-  private formdataEventListener = (event: any /* FormDataEvent */) => { // TODO:
-    if (this.disabled) return;
-    const data = event.formData;
-    data.append(this.name, this.member.id);
   }
 
   get form() {
@@ -90,11 +75,12 @@ export default class UniposRecipientElement extends HTMLElement {
   }
 
   get disabled() {
-    return !!this._disabled;
+    return this.hasAttribute('disabled');
   }
 
   set disabled(value) {
-    this._disabled = !!value;
+    if (value) this.setAttribute('disabled', '');
+    else this.removeAttribute('disabled');
   }
 
   get member() {

@@ -16,19 +16,34 @@ const i18n = new Internationalization({
 }, 'en', ...window.navigator.languages);
 
 export default class UniposRecipientsElement extends HTMLElement {
-  static get observedAttributes() { return ['disabled', 'required']; }
+  static get observedAttributes() { return ['required']; }
   static get formAssociated() { return true; }
 
-  private _disabled = false;
   private internals: any /* ElementInternals */; // TODO:
-  private pastForm: HTMLFormElement = null;
   private input: HTMLInputElement = undefined;
+  private mutationObserver = new MutationObserver(mutations => {
+    for (const mutation of mutations) {
+      if (mutation.type === 'attributes') {
+        switch (mutation.attributeName) {
+          case 'disabled':
+            this.setFormValue();
+            this.validate();
+            break;
+
+          case 'data-id':
+            this.setFormValue();
+            break;
+
+          default:
+            break;
+        }
+      }
+    }
+  });
 
   constructor() {
     super();
-    this.disabled = false;
     this.internals = (this as any).attachInternals(); // TODO:
-    this.internals.setFormValue(null);
     const shadow = this.attachShadow({ mode: 'open' });
     const template = document.getElementById('unipos-recipients') as HTMLTemplateElement;
     shadow.appendChild(document.importNode(template.content, true));
@@ -42,6 +57,11 @@ export default class UniposRecipientsElement extends HTMLElement {
 
     const recipientsSlot = shadow.querySelector<HTMLSlotElement>('slot[name="recipients"]');
     recipientsSlot.addEventListener('slotchange', event => {
+      this.mutationObserver.disconnect();
+      for (const recipient of this.recipientElements) {
+        this.mutationObserver.observe(recipient, { attributes: true, attributeFilter: ['disabled', 'data-id'] });
+      }
+      this.setFormValue();
       this.validate();
       this.dispatchEvent(new CustomEvent('change'));
     });
@@ -49,10 +69,6 @@ export default class UniposRecipientsElement extends HTMLElement {
 
   public attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null) {
     switch (name) {
-      case 'disabled':
-        this.disabled = newValue !== null;
-        break;
-
       case 'required':
         if (this.required) this.validate();
         break;
@@ -67,15 +83,11 @@ export default class UniposRecipientsElement extends HTMLElement {
   }
 
   public formAssociatedCallback(form: HTMLFormElement) {
-    this.pastForm && this.pastForm.removeEventListener('formdata', this.formdataEventListener);
-    form && form.addEventListener('formdata', this.formdataEventListener);
-    this.pastForm = form;
+    this.setFormValue();
   }
 
   public formDisabledCallback(disabled: boolean) {
-    this.disabled = disabled;
-    this.recipientElements
-      .forEach(recipient => recipient.disabled = disabled);
+    this.validate();
   }
 
   public findMembers(...ids: string[]) {
@@ -98,18 +110,19 @@ export default class UniposRecipientsElement extends HTMLElement {
     return element;
   }
 
-  private formdataEventListener = (event: any /* FormDataEvent */) => { // TODO:
-    if (this.disabled) return;
-    const data = event.formData;
-    for (const recipient of this.recipientElements) {
-      if (recipient.disabled) continue;
-      data.append(this.name, recipient.member.id);
-    }
+  private setFormValue() {
+    const data = this.recipientElements
+      .filter(recipient => !recipient.disabled)
+      .reduce((formData, recipient) => {
+        formData.append(this.name, recipient.member.id);
+        return formData;
+      }, new FormData());
+    this.internals.setFormValue(data);
   }
 
   private validate() {
     this.internals.setValidity({
-      valueMissing: this.required && this.recipientElements.length === 0,
+      valueMissing: this.required && this.recipientElements.filter(recipient => !recipient.disabled).length === 0,
     }, i18n.getMessage('valueMissing'), this.input);
   }
 
@@ -126,11 +139,12 @@ export default class UniposRecipientsElement extends HTMLElement {
   }
 
   get disabled() {
-    return !!this._disabled;
+    return this.hasAttribute('disabled');
   }
 
   set disabled(value) {
-    this._disabled = !!value;
+    if (value) this.setAttribute('disabled', '');
+    else this.removeAttribute('disabled');
   }
 
   get required() {
