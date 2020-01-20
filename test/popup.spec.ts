@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import * as puppeteer from 'puppeteer';
 
-describe('popup', () => {
+(Boolean(process.env.TRAVIS) ? describe.skip : describe)('popup', () => {
   before(async function before() {
     const extensionPath = process.cwd();
     const browser = await puppeteer.launch({
