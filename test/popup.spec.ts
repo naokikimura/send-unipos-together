@@ -3,6 +3,7 @@ import * as puppeteer from 'puppeteer';
 
 (Boolean(process.env.TRAVIS) ? describe.skip : describe)('popup', () => {
   before(async function before() {
+    this.timeout(5000);
     const extensionPath = process.cwd();
     const browser = await puppeteer.launch({
       args: [
