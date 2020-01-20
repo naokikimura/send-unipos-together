@@ -8,41 +8,34 @@ const sources = {
   scss: 'src/**/*.{,s}css',
 }
 
-async function exec(file, args = [], options) {
-  function writeToConsole(result) {
-    const { stdout, stderror } = result;
-    if (stdout) process.stdout.write(stdout);
-    if (stderror) process.stderror.write(stderror);
-    if (result instanceof Error) throw result;
-  }
-  const execFile = require('util').promisify(require('child_process').execFile);
-  return execFile(file, args.filter(e => e === 0 || e), options)
-    .then(writeToConsole)
-    .catch(writeToConsole);
+function spawn(command, args = [], options) {
+  const child = require('child_process')
+    .spawn(command, args.filter(e => e === 0 || e), options);
+  if (child.stdout) child.stdout.pipe(process.stdout);
+  if (child.stderr) child.stderr.pipe(process.stderr);
+  return child;
 }
 
 exports['transpile:tsc'] = function tsc() {
   const options = ['--pretty', sourcemaps ? '--sourceMap' : undefined];
-  return exec('tsc', options);
+  return spawn('tsc', options);
 }
 
 exports['transpile:sass'] = function sass() {
   const options = [sourcemaps ? '--source-map' : undefined];
-  return exec('sass', ['src/:dist/'].concat(options));
+  return spawn('sass', ['src/:dist/'].concat(options));
 }
 
 exports['lint:tslint'] = function tslint() {
-  return exec('tslint', ['-p', 'tsconfig.json']);
+  return spawn('tslint', ['-p', 'tsconfig.json']);
 }
 
 exports['lint:stylelint'] = function stylelint() {
-  return exec('stylelint', [sources.scss]);
+  return spawn('stylelint', [sources.scss]);
 }
 
 exports['test:mocha'] = function mocha() {
-  const mocha = require('gulp-mocha-thin');
-  return gulp.src('./test/**/*.spec.{j,t}s')
-    .pipe(mocha());
+  return spawn('mocha', ['-c']);
 }
 
 exports.assemble = function assemble() {

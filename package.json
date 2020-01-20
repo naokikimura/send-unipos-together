@@ -27,7 +27,6 @@
     "chai": "^4.2.0",
     "gulp": "^4.0.2",
     "gulp-chrome-web-store": "~0.0.1",
-    "gulp-mocha-thin": "~0.0.7",
     "gulp-package-dependencies": "~0.0.1",
     "gulp-zip": "^5.0.1",
     "mocha": "^7.0.0",
