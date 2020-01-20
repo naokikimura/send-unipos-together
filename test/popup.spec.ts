@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import * as puppeteer from 'puppeteer';
 
-(Boolean(process.env.TRAVIS) || Boolean(process.env.CIRCLECI) ? describe.skip : describe)('popup', () => {
+(Boolean(process.env.TRAVIS) ? describe.skip : describe)('popup', () => {
   before(async function before() {
     this.timeout(5000);
     const extensionPath = process.cwd();
