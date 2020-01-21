@@ -39,58 +39,77 @@ window.addEventListener('DOMContentLoaded', () => {
       });
   }
 
-  for (const form of document.querySelectorAll<UniposCardFormElement>('form[is="unipos-card-form"]')) {
-    form.fetchProfile = () => api.getProfile();
-    form.sendCard = (...args) => api.sendCard(...args).then(result => { });
+  const form = document.querySelector<UniposCardFormElement>('form[is="unipos-card-form"]');
+  form.fetchProfile = () => api.getProfile();
+  form.sendCard = (...args) => api.sendCard(...args).then(result => { });
 
-    form.addEventListener('reset', event => {
-      progress.value = 0;
-      statusText.textContent = '';
+  form.addEventListener('reset', event => {
+    progress.value = 0;
+    statusText.textContent = '';
+  });
 
-      // FIXME:
-      for (const node of form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input,textarea')) {
-        node.readOnly = false;
-      }
-    });
+  form.addEventListener('cardsubmit', (event: CustomEvent) => {
+    progress.value = 0;
+    progress.max = recipients.members.length;
+    statusText.textContent = browser.i18n.getMessage('card_submit');
+    dialog.querySelector<HTMLButtonElement>('form button[value="ok"]').disabled = true;
+    dialog.querySelector<HTMLButtonElement>('form button[value="cancel"]').disabled = false;
+    dialog.showModal();
+  });
 
-    form.addEventListener('cardsubmit', (event: CustomEvent) => {
-      progress.max = recipients.members.length;
-      statusText.textContent = '';
+  form.addEventListener('cardsubmitted', (event: CustomEvent) => {
+    statusText.textContent = browser.i18n.getMessage('card_submitted');
+    dialog.querySelector<HTMLButtonElement>('form button[value="ok"]').disabled = false;
+    dialog.querySelector<HTMLButtonElement>('form button[value="cancel"]').disabled = true;
+  });
 
-      // FIXME:
-      for (const node of form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input,textarea')) {
-        node.readOnly = true;
-      }
-    });
+  form.addEventListener('cardsubmittingerror', (event: CustomEvent) => {
+    statusText.textContent = browser.i18n.getMessage('card_submitting_error');
+    dialog.querySelector<HTMLButtonElement>('form button[value="ok"]').disabled = false;
+    dialog.querySelector<HTMLButtonElement>('form button[value="cancel"]').disabled = true;
+    console.error(event);
+  });
 
-    form.addEventListener('cardsubmitted', (event: CustomEvent) => {
-      window.alert(browser.i18n.getMessage('m1'));
-      form.reset();
-    });
+  form.addEventListener('cardsubmitcanceled', (event: CustomEvent) => {
+    statusText.textContent = browser.i18n.getMessage('card_submit_canceled');
+    dialog.querySelector<HTMLButtonElement>('form button[value="ok"]').disabled = false;
+    dialog.querySelector<HTMLButtonElement>('form button[value="cancel"]').disabled = true;
+    console.info(event);
+  });
 
-    form.addEventListener('cardsubmittingerror', (event: CustomEvent) => {
-      window.alert(browser.i18n.getMessage('m4'));
-      console.error(event);
-    });
+  form.addEventListener('send', (event: CustomEvent) => {
+    const to = event.detail.to;
+    progress.value += 1;
+    if (!to.id) return event.preventDefault();
+    statusText.textContent = browser.i18n.getMessage('send', to.display_name);
+  });
 
-    form.addEventListener('send', (event: CustomEvent) => {
-      const to = event.detail.to;
-      progress.value += 1;
-      if (!to.id) return event.preventDefault();
-      statusText.textContent = browser.i18n.getMessage('m3', to.display_name);
-    });
+  form.addEventListener('sendingerror', (event: CustomEvent) => {
+    event.preventDefault();
+    console.error(event);
+  });
 
-    form.addEventListener('sendingerror', (event: CustomEvent) => {
-      event.preventDefault();
-      console.error(event);
-    });
+  form.addEventListener('sent', (event: CustomEvent) => {
+    console.debug(event);
+    const to = event.detail.to;
+    console.info(`Sent Unipos to ${to.display_name}`);
+  });
 
-    form.addEventListener('sent', (event: CustomEvent) => {
-      console.debug(event);
-      const to = event.detail.to;
-      console.info(`Sent Unipos to ${to.display_name}`);
-    });
-  }
+  const dialog = document.getElementById('dialog') as HTMLDialogElement;
+  dialog.addEventListener('close', event => {
+    switch (dialog.returnValue) {
+      case 'cancel':
+        form.cancel();
+        break;
+
+      case 'ok':
+        form.reset();
+        break;
+
+      default:
+        break;
+    }
+  });
 
   browser.storage.sync.get(['options']).then(result => {
     const { recipientMembers = [], point = null, message = '' } = result.options || {};

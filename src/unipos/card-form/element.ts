@@ -5,12 +5,14 @@ export default class UniposCardFormElement extends HTMLFormElement {
   private _sendCard: (id: string, to: string, point: number, message: string) => void | Promise<void>;
   private _fetchProfile: () => UniposProfile | Promise<UniposProfile>;
   private _resolveMembers: (...ids: string[]) => UniposMember[];
+  private isCanceled = false;
 
   constructor() {
     super();
 
     this.addEventListener('submit', event => {
       event.preventDefault();
+      this.isCanceled = false;
       const cardSubmitEvent = new CustomEvent('cardsubmit', { cancelable: true });
       if (!this.dispatchEvent(cardSubmitEvent)) return;
       const data = new FormData(this);
@@ -21,6 +23,11 @@ export default class UniposCardFormElement extends HTMLFormElement {
         const message = String(data.get('message'));
         const members = this.resolveMembers(...data.getAll('to').map(String));
         for (const to of members) {
+          if (this.isCanceled) {
+            const submitCanceledEvent = new CustomEvent('cardsubmitcanceled');
+            this.dispatchEvent(submitCanceledEvent);
+            return;
+          }
           const sendEvent = new CustomEvent('send', { cancelable: true, detail: { to, from, point, message } });
           if (!this.dispatchEvent(sendEvent)) continue;
           try {
@@ -39,6 +46,10 @@ export default class UniposCardFormElement extends HTMLFormElement {
         this.dispatchEvent(cardSubmittingErrorEvent);
       });
     });
+  }
+
+  public cancel() {
+    this.isCanceled = true;
   }
 
   get fetchProfile() {

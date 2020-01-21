@@ -84,6 +84,58 @@ form#send_card button[type="reset"] {
   display: none;
 }
 
-#progress[value="0"] {
-  display: none;
+#progress {
+  width: 100%;
+}
+
+dialog#dialog {
+  width: 70%;
+  color: #454a4a;
+  background-color: #f7fcfc;
+  padding: 1em;
+  margin: auto;
+  border: 0;
+  border-radius: 2px;
+  filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.6));
+}
+
+dialog#dialog form {
+  display: grid;
+}
+
+dialog#dialog form > fieldset {
+  margin: .5ex;
+}
+
+dialog#dialog form > fieldset:nth-of-type(3) {
+  text-align: right;
+}
+
+dialog#dialog form button {
+  color: #80d5d7;
+  border: solid thin #55cbe1;
+  margin-right: .5ex;
+  padding: .5ex 1ex;
+  border-radius: 1em;
+  min-width: 7em;
+}
+
+dialog#dialog form button:disabled {
+  color: #d3d8d8;
+  border-color: #d3d8d8;
+  background-color: #ffffff;
+}
+
+dialog#dialog form button::before {
+  font-family: "Material Icons";
+  font-size: 80%;
+  padding-right: 2px;
+}
+
+dialog#dialog form button[value="ok"]::before {
+  content: "check";
+}
+
+dialog#dialog form button[value="cancel"]::before {
+  content: "cancel";
 }

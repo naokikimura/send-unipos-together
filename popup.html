@@ -59,11 +59,21 @@
       <button type="reset">リセット</button>
       <button type="submit">おくる</button>
     </fieldset>
-    <span id="status">
-      <span id="status_text"></span>
-      <progress id="progress" value="0"></progress>
-    </span>
   </form>
+  <dialog id="dialog">
+    <form action="" method="dialog">
+      <fieldset>
+        <span id="status_text"></span>
+      </fieldset>
+      <fieldset>
+        <progress id="progress" value="0"></progress>
+      </fieldset>
+      <fieldset>
+        <button value="cancel">キャンセル</button>
+        <button value="ok">OK</button>
+      </fieldset>
+    </form>
+  </dialog>
 </body>
 
 </html>

@@ -1,19 +1,22 @@
 {
-    "m1": {
-        "message": "おくりました 🎉"
-    },
-    "m2": {
-        "message": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVQIHWP4DwABAQEANl9ngAAAAABJRU5ErkJggg=="
-    },
-    "m3": {
-        "message": "$TO$さんにおくっています...",
-        "placeholders": {
-            "to": {
-                "content": "$1"
-            }
-        }
-    },
-    "m4": {
-        "message": "おくれませんでした 🙇"
+  "card_submitted": {
+    "message": "おくりました 🎉"
+  },
+  "send": {
+    "message": "$TO$さんにおくっています...",
+    "placeholders": {
+      "to": {
+        "content": "$1"
+      }
     }
+  },
+  "card_submitting_error": {
+    "message": "おくれませんでした 🙇"
+  },
+  "card_submit_canceled": {
+    "message": "キャンセルしました。"
+  },
+  "card_submit": {
+    "message": "おくります"
+  }
 }
