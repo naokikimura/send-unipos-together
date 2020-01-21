@@ -21,11 +21,11 @@ export default class UniposRecipientElement extends HTMLElement {
 
   static get formAssociated() { return true; }
 
-  private internals: any /* ElementInternals */; // TODO:
+  private internals: ElementInternals;
 
   constructor() {
     super();
-    this.internals = (this as any).attachInternals(); // TODO:
+    this.internals = this.attachInternals();
     const shadow = this.attachShadow({ mode: 'open' });
     const template = document.getElementById('unipos-recipient') as HTMLTemplateElement;
     shadow.appendChild(document.importNode(template.content, true));

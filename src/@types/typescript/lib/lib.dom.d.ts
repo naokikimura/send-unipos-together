@@ -5,7 +5,7 @@ type FormValue = File | USVString | FormData | null;
 
 declare interface ElementInternals {
   readonly form: HTMLFormElement;
-  readonly labels :NodeList;
+  readonly labels: NodeList;
   readonly validationMessage: DOMString;
   readonly validity: ValidityState;
   readonly willValidate: boolean;
@@ -26,4 +26,13 @@ declare interface ValidityStateFlags {
   stepMismatch?: boolean;
   badInput?: boolean;
   customError?: boolean;
+}
+
+interface HTMLElement {
+  attachInternals(): ElementInternals;
+}
+
+declare var HTMLElement: {
+  prototype: HTMLElement;
+  new(): HTMLElement;
 }

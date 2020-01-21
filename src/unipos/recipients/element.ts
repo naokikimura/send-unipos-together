@@ -43,7 +43,7 @@ export default class UniposRecipientsElement extends HTMLElement {
 
   constructor() {
     super();
-    this.internals = (this as any).attachInternals(); // TODO:
+    this.internals = this.attachInternals();
     const shadow = this.attachShadow({ mode: 'open' });
     const template = document.getElementById('unipos-recipients') as HTMLTemplateElement;
     shadow.appendChild(document.importNode(template.content, true));
