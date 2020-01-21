@@ -19,7 +19,7 @@ export default class UniposRecipientsElement extends HTMLElement {
   static get observedAttributes() { return ['required']; }
   static get formAssociated() { return true; }
 
-  private internals: any /* ElementInternals */; // TODO:
+  private internals: ElementInternals;
   private input: HTMLInputElement = undefined;
   private mutationObserver = new MutationObserver(mutations => {
     for (const mutation of mutations) {
@@ -126,7 +126,7 @@ export default class UniposRecipientsElement extends HTMLElement {
     }, i18n.getMessage('valueMissing'), this.input);
   }
 
-  get form(): HTMLFormElement {
+  get form() {
     return this.internals.form;
   }
 
