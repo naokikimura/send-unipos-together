@@ -35,7 +35,10 @@ exports['lint:stylelint'] = function stylelint() {
 }
 
 exports['test:mocha'] = function mocha() {
-  return spawn('mocha', ['-c']);
+  const options = process.env.CI
+    ? ['-R', 'xunit', '-O', 'output=./reports/xunit/test-results.xml']
+    : ['-c'];
+  return spawn('mocha', options);
 }
 
 exports.assemble = function assemble() {

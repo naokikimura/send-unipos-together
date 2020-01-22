@@ -54,6 +54,9 @@ jobs:
     # run tests!
     - run: npm test
 
+    - store_test_results:
+        path: ./reports
+
   publish:
     executor:
       name: default
