@@ -40,7 +40,16 @@ exports['test:mocha'] = function mocha() {
 
 exports.assemble = function assemble() {
   const dependencies = require('gulp-package-dependencies');
-  return dependencies({ excludes: name => !/^@types\//.test(name) })
+  const path = require('path');
+  return dependencies({
+    excludes: name => !/^@types\//.test(name),
+    glob: name => {
+      switch (name) {
+        case 'material-design-icons': return 'iconfont/**/*';
+        default: return '**/*';
+      }
+    }
+  })
     .pipe(gulp.dest('dist'));
 }
 
