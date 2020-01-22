@@ -76,7 +76,7 @@ exports['package:zip'] = function zip() {
   ];
   return gulp.src('./**/*', { ignore })
     .pipe(zip(`${package.name}-${package.version}.zip`))
-    .pipe(gulp.dest('.'));
+    .pipe(gulp.dest('./artifacts'));
 }
 
 const webstore = require('gulp-chrome-web-store')(
@@ -90,7 +90,7 @@ exports.publish = function publish() {
 }
 
 exports['deploy:upload'] = function upload() {
-  return gulp.src(`${package.name}-${package.version}.zip`)
+  return gulp.src(`./artifacts/${package.name}-${package.version}.zip`)
     .pipe(webstore.upload());
 }
 

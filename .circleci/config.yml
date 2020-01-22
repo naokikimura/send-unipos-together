@@ -68,6 +68,9 @@ jobs:
 
       - deploy: npx gulp --series deploy publish
 
+      - store_artifacts:
+          path: ./artifacts
+
 workflows:
   setup-test-publish:
     jobs:

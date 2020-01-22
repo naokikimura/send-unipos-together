@@ -110,3 +110,4 @@ dist
 *.zip
 client_secret_*.json
 reports/
+artifacts/
