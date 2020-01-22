@@ -57,6 +57,21 @@ jobs:
     - store_test_results:
         path: ./reports
 
+  deploy:
+    executor:
+      name: default
+
+    steps:
+      - checkout
+      - restore_node_modules
+      - run: npm install
+
+      - deploy:
+          command: npx gulp deploy
+
+      - store_artifacts:
+          path: ./artifacts
+
   publish:
     executor:
       name: default
@@ -66,10 +81,8 @@ jobs:
       - restore_node_modules
       - run: npm install
 
-      - deploy: npx gulp --series deploy publish
-
-      - store_artifacts:
-          path: ./artifacts
+      - deploy:
+          command: npx gulp publish
 
 workflows:
   setup-test-publish:
@@ -88,10 +101,16 @@ workflows:
             only: /.*/
         requires:
         - setup
+    - deploy:
+        filters:
+          tags:
+            only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
+        requires:
+        - test
     - publish:
         type: approval
         filters:
           tags:
             only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
         requires:
-        - test
+        - deploy
