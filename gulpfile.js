@@ -79,19 +79,19 @@ exports['package:zip'] = function zip() {
     .pipe(gulp.dest('./artifacts'));
 }
 
-const webstore = require('gulp-chrome-web-store')(
-  'pgpnkghddnfoopjapnlklllpjknnibkn',
+const chromeWebstore = require('gulp-chrome-web-store')(
   process.env.CHROME_WEB_STORE_API_CREDENTIAL,
   process.env.CHROME_WEB_STORE_API_ACCESS_TOKEN_RESPONSE,
 );
+const item = chromeWebstore.item('pgpnkghddnfoopjapnlklllpjknnibkn');
 
 exports.publish = function publish() {
-  return webstore.publish();
+  return item.publish();
 }
 
 exports['deploy:upload'] = function upload() {
   return gulp.src(`./artifacts/${package.name}-${package.version}.zip`)
-    .pipe(webstore.upload());
+    .pipe(item.upload());
 }
 
 exports['watch:typescript'] = function watchTypeScript() {
