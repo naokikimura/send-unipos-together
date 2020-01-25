@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import * as puppeteer from 'puppeteer';
 
-(Boolean(process.env.TRAVIS) ? describe.skip : describe)('popup', () => {
+(process.env.TRAVIS ? describe.skip : describe)('popup', () => {
   before(async function before() {
     this.timeout(5000);
     const extensionPath = process.cwd();
@@ -16,7 +16,7 @@ import * as puppeteer from 'puppeteer';
 
     const extensionPage = await browser.newPage();
     const extensionPopupHtml = 'popup.html';
-    const extensionID = (targets => {
+    const extensionID = ((targets): string => {
       const extensionTarget = targets.find(target => target.type() === 'background_page');
       const [, , id] = extensionTarget.url().split('/');
       return id;

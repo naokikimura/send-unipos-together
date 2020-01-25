@@ -1,16 +1,16 @@
 import { UniposMember } from '../index';
 
-function updateShadow(shadowRoot: ShadowRoot, { id = '', uname = '', display_name = '', picture_url }: DOMStringMap) {
+function updateShadow(shadowRoot: ShadowRoot, { id = '', uname = '', display_name: displayName = '', picture_url: pictureUrl }: DOMStringMap): void {
   shadowRoot.getElementById('member-id').textContent = id;
   shadowRoot.getElementById('member-uname').textContent = uname;
-  shadowRoot.getElementById('member-display_name').textContent = display_name;
+  shadowRoot.getElementById('member-display_name').textContent = displayName;
   const img = shadowRoot.getElementById('member-picture') as HTMLImageElement;
-  img.setAttribute('alt', display_name);
-  img.src = picture_url || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+  img.setAttribute('alt', displayName);
+  img.src = pictureUrl || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 }
 
 export default class UniposRecipientElement extends HTMLElement {
-  static get observedAttributes() {
+  static get observedAttributes(): string[] {
     return [
       'data-id',
       'data-uname',
@@ -19,7 +19,7 @@ export default class UniposRecipientElement extends HTMLElement {
     ];
   }
 
-  static get formAssociated() { return true; }
+  static get formAssociated(): boolean { return true; }
 
   private internals: ElementInternals;
 
@@ -29,28 +29,29 @@ export default class UniposRecipientElement extends HTMLElement {
     const shadow = this.attachShadow({ mode: 'open' });
     const template = document.getElementById('unipos-recipient') as HTMLTemplateElement;
     shadow.appendChild(document.importNode(template.content, true));
-    shadow.getElementById('remove').addEventListener('click', event => {
+    shadow.getElementById('remove').addEventListener('click', () => {
       this.remove();
     });
   }
 
-  public formAssociatedCallback(form: HTMLFormElement) {
+  public formAssociatedCallback(): void {
     this.internals.setFormValue(this.member.id);
   }
 
-  public formDisabledCallback(disabled: boolean) {
+  public formDisabledCallback(disabled: boolean): void {
     const button = this.shadowRoot.getElementById('remove') as HTMLButtonElement;
     button.disabled = disabled;
   }
 
-  public connectedCallback() {
+  public connectedCallback(): void {
     updateShadow(this.shadowRoot, this.dataset);
   }
 
-  public attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null) {
+  public attributeChangedCallback(name: string): void {
     switch (name) {
       case 'data-id':
         this.internals.setFormValue(this.member.id);
+      // eslint-disable-next-line no-fallthrough
       case 'data-uname':
       case 'data-display_name':
       case 'data-picture_url':
@@ -62,11 +63,11 @@ export default class UniposRecipientElement extends HTMLElement {
     }
   }
 
-  get form() {
+  get form(): HTMLFormElement {
     return this.internals.form;
   }
 
-  get name() {
+  get name(): string {
     return this.getAttribute('name');
   }
 
@@ -74,7 +75,7 @@ export default class UniposRecipientElement extends HTMLElement {
     this.setAttribute('name', value);
   }
 
-  get disabled() {
+  get disabled(): boolean {
     return this.hasAttribute('disabled');
   }
 
@@ -83,11 +84,11 @@ export default class UniposRecipientElement extends HTMLElement {
     else this.removeAttribute('disabled');
   }
 
-  get member() {
+  get member(): UniposMember {
     return {
-      display_name: this.dataset.display_name,
+      'display_name': this.dataset.display_name,
       id: this.dataset.id,
-      picture_url: this.dataset.picture_url,
+      'picture_url': this.dataset.picture_url,
       uname: this.dataset.uname,
     } as UniposMember;
   }

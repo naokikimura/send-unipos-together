@@ -32,6 +32,7 @@ interface HTMLElement {
   attachInternals(): ElementInternals;
 }
 
+// eslint-disable-next-line no-var
 declare var HTMLElement: {
   prototype: HTMLElement;
   new(): HTMLElement;
