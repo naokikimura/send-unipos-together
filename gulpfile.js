@@ -77,6 +77,8 @@ exports['package:zip'] = function zip() {
   const ignore = [
     '*.zip',
     '.*',
+    'artifacts',
+    'artifacts/**/*',
     'client_secret_*.json',
     'coverage',
     'coverage/**/*',
@@ -84,6 +86,8 @@ exports['package:zip'] = function zip() {
     'node_modules',
     'node_modules/**/*',
     'package{,-lock}.json',
+    'reports',
+    'reports/**/*',
     'stylelint.config.js',
     'test',
     'test/**/*',
