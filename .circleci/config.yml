@@ -49,10 +49,22 @@ jobs:
     steps:
     - checkout
     - restore_node_modules
-    - run: npm install
 
     # run tests!
     - run: npm test
+
+    - store_test_results:
+        path: ./reports
+
+  lint:
+    executor:
+      name: default
+
+    steps:
+    - checkout
+    - restore_node_modules
+
+    - run: npx gulp lint
 
     - store_test_results:
         path: ./reports
@@ -64,7 +76,6 @@ jobs:
     steps:
       - checkout
       - restore_node_modules
-      - run: npm install
 
       - deploy:
           command: npx gulp deploy
@@ -79,7 +90,6 @@ jobs:
     steps:
       - checkout
       - restore_node_modules
-      - run: npm install
 
       - deploy:
           command: npx gulp publish
@@ -101,6 +111,14 @@ workflows:
             only: /.*/
         requires:
         - setup
+    - lint:
+        filters:
+          tags:
+            only: /.*/
+          branches:
+            only: /.*/
+        requires:
+        - setup
     - deploy:
         filters:
           tags:
@@ -109,7 +127,7 @@ workflows:
             only: master
         requires:
         - test
-    - publish:
+    - hold:
         type: approval
         filters:
           tags:
@@ -118,3 +136,6 @@ workflows:
             only: master
         requires:
         - deploy
+    - publish:
+        requires:
+        - hold

@@ -32,13 +32,27 @@ exports['lint:eslint'] = function tslint() {
   return spawn('eslint', options);
 }
 
-exports['lint:stylelint'] = function stylelint() {
-  return spawn('stylelint', [sources.scss]);
+exports['lint:stylelint'] = async function stylelint() {
+  if (process.env.CI) {
+    const fs = require('fs');
+    const util = require('util');
+    await util.promisify(fs.mkdir)('./reports/stylelint/', { recursive: true });
+  }
+  const options = process.env.CI
+    ? [
+      '--custom-formatter',
+      './node_modules/stylelint-junit-formatter',
+      '-o',
+      './reports/stylelint/test-results.xml',
+    ]
+    : [];
+  const stdio = ['pipe', process.env.CI ? 'ignore' : 'pipe', 'pipe'];
+  return spawn('stylelint', options.concat([sources.scss]), { stdio });
 }
 
 exports['test:mocha'] = function mocha() {
   const options = process.env.CI
-    ? ['-R', 'xunit', '-O', 'output=./reports/xunit/test-results.xml']
+    ? ['-R', 'xunit', '-O', 'output=./reports/mocha/test-results.xml']
     : ['-c'];
   return spawn('mocha', options);
 }
