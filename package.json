@@ -3,7 +3,8 @@
   "version": "0.0.10",
   "description": "This extension allows you to send Unipos to multiple destinations at once.",
   "scripts": {
-    "test": "gulp test"
+    "test": "gulp test",
+    "version": "gulp version:sync && git add manifest.json"
   },
   "repository": {
     "type": "git",
