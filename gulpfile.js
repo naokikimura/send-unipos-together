@@ -128,7 +128,7 @@ exports['version:sync'] = async function () {
   const fs = require('fs');
   const stream = require('stream');
   const Vinyl = require('vinyl');
-  function sync(referenceFile) {
+  function sync(referenceFile, key = 'version') {
     const reference = JSON.parse(fs.readFileSync(referenceFile)).version;
     return new stream.Transform({
       objectMode: true,
@@ -142,7 +142,7 @@ exports['version:sync'] = async function () {
             try {
               const contents = Buffer.concat(chunks).toString(encoding);
               const version = JSON.parse(contents).version || '';
-              const regex = new RegExp(`("version"\\s*:\\s*")(${version.replace(/\./g, '\\.')})(")`);
+              const regex = new RegExp(`("${key}"\\s*:\\s*")(${version.replace(/\./g, '\\.')})(")`);
               callback(null, new Vinyl({
                 contents: Buffer.from(contents.replace(regex, `$1${reference}$3`), encoding),
                 history: file.history,
