@@ -1,6 +1,6 @@
 {
   "name": "send-unipos-together",
-  "version": "0.0.12-0",
+  "version": "0.0.12",
   "description": "This extension allows you to send Unipos to multiple destinations at once.",
   "scripts": {
     "test": "gulp test",
