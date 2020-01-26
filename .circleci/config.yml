@@ -97,26 +97,11 @@ jobs:
 workflows:
   setup-test-publish:
     jobs:
-    - setup:
-        filters:
-          tags:
-            only: /.*/
-          branches:
-            only: /.*/
+    - setup
     - test:
-        filters:
-          tags:
-            only: /.*/
-          branches:
-            only: /.*/
         requires:
         - setup
     - lint:
-        filters:
-          tags:
-            only: /.*/
-          branches:
-            only: /.*/
         requires:
         - setup
     - deploy:
@@ -129,11 +114,6 @@ workflows:
         - test
     - hold:
         type: approval
-        filters:
-          tags:
-            only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
-          branches:
-            ignore: /.*/
         requires:
         - deploy
     - publish:
