@@ -125,39 +125,9 @@ exports['watch:scss'] = function watchSCSS() {
 }
 
 exports['version:sync'] = async function () {
-  const fs = require('fs');
-  const stream = require('stream');
-  const Vinyl = require('vinyl');
-  function sync(referenceFile, key = 'version') {
-    const reference = JSON.parse(fs.readFileSync(referenceFile)).version;
-    return new stream.Transform({
-      objectMode: true,
-      transform(file, encoding, callback) {
-        if (!(Vinyl.isVinyl(file) && file.isBuffer() || file.isStream())) return callback(null, file);
-        const chunks = [];
-        const readable = file.isBuffer() ? stream.Readable.from([file.contents]) : file.contents;
-        readable
-          .on('data', chunk => chunks.push(chunk))
-          .on('end', () => {
-            try {
-              const contents = Buffer.concat(chunks).toString(encoding);
-              const version = JSON.parse(contents).version || '';
-              const regex = new RegExp(`("${key}"\\s*:\\s*")(${version.replace(/\./g, '\\.')})(")`);
-              callback(null, new Vinyl({
-                contents: Buffer.from(contents.replace(regex, `$1${reference}$3`), encoding),
-                history: file.history,
-              }));
-            } catch (error) {
-              callback(error);
-            }
-          })
-          .on('error', callback);
-      }
-    });
-  }
-
+  const unify = require('gulp-unify-versions');
   return gulp.src('./manifest.json')
-    .pipe(sync('./package.json'))
+    .pipe(unify('./package.json'))
     .pipe(gulp.dest('./'));
 }
 
