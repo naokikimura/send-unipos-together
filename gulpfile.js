@@ -124,7 +124,7 @@ exports['watch:scss'] = function watchSCSS() {
   return gulp.watch(sources.scss, task);
 }
 
-exports['version:sync'] = async function () {
+exports['version:sync'] = () => {
   const unify = require('gulp-unify-versions');
   return gulp.src('./manifest.json')
     .pipe(unify('./package.json'))
