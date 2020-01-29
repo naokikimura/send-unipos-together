@@ -1,9 +1,8 @@
 export default class UniposMessageElement extends HTMLTextAreaElement {
   constructor() {
     super();
-    this.addEventListener('input', event => {
-      const textarea = this;
-      while (textarea.scrollHeight > textarea.offsetHeight) textarea.rows++;
+    this.addEventListener('input', () => {
+      while (this.scrollHeight > this.offsetHeight) this.rows++;
     });
   }
 }

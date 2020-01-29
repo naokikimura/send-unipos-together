@@ -1,22 +1,26 @@
 import { UniposMember, UniposProfile } from '../index';
 import UniposRecipientsElement from '../recipients/element.js';
 
+type SendCard = (id: string, to: string, point: number, message: string) => void | Promise<void>;
+type FetchProfile = () => UniposProfile | Promise<UniposProfile>;
+type ResolveMembers = (...ids: string[]) => UniposMember[];
+
 export default class UniposCardFormElement extends HTMLFormElement {
-  private _sendCard: (id: string, to: string, point: number, message: string) => void | Promise<void>;
-  private _fetchProfile: () => UniposProfile | Promise<UniposProfile>;
-  private _resolveMembers: (...ids: string[]) => UniposMember[];
+  private _sendCard: SendCard;
+  private _fetchProfile: FetchProfile;
+  private _resolveMembers: ResolveMembers;
   private isCanceled = false;
 
   constructor() {
     super();
 
-    this.addEventListener('submit', event => {
+    this.addEventListener('submit', async event => {
       event.preventDefault();
       this.isCanceled = false;
       const cardSubmitEvent = new CustomEvent('cardsubmit', { cancelable: true });
       if (!this.dispatchEvent(cardSubmitEvent)) return;
       const data = new FormData(this);
-      (async () => {
+      try {
         const profile = (await this.fetchProfile()) || { member: {} } as UniposProfile;
         const from = profile.member;
         const point = Number(data.get('point'));
@@ -41,37 +45,37 @@ export default class UniposCardFormElement extends HTMLFormElement {
         }
         const cardsubmittedEvent = new CustomEvent('cardsubmitted');
         this.dispatchEvent(cardsubmittedEvent);
-      })().catch(error => {
+      } catch (error) {
         const cardSubmittingErrorEvent = new CustomEvent('cardsubmittingerror', { detail: error });
         this.dispatchEvent(cardSubmittingErrorEvent);
-      });
+      }
     });
   }
 
-  public cancel() {
+  public cancel(): void {
     this.isCanceled = true;
   }
 
-  get fetchProfile() {
-    return this._fetchProfile instanceof Function ? this._fetchProfile : () => ({ member: {} } as UniposProfile);
+  get fetchProfile(): FetchProfile {
+    const defaultFetchProfile: FetchProfile = () => ({ member: {} } as UniposProfile)
+    return this._fetchProfile instanceof Function ? this._fetchProfile : defaultFetchProfile;
   }
 
   set fetchProfile(value) {
     this._fetchProfile = value;
   }
 
-  get sendCard() {
-    return this._sendCard instanceof Function
-      ? this._sendCard
-      : (...args: [string, string, number, string]) => { };
+  get sendCard(): SendCard {
+    return this._sendCard instanceof Function ? this._sendCard : (): void => undefined;
   }
 
   set sendCard(value) {
     this._sendCard = value;
   }
 
-  get resolveMembers() {
-    const defaultResolveMembers = (...ids: string[]) => this.recipientsElements.flatMap(e => e.findMembers(...ids));
+  get resolveMembers(): ResolveMembers {
+    const defaultResolveMembers: ResolveMembers = (...ids: string[]) =>
+      this.recipientsElements.flatMap(e => e.findMembers(...ids));
     return this._resolveMembers instanceof Function ? this._resolveMembers : defaultResolveMembers;
   }
 
@@ -79,7 +83,7 @@ export default class UniposCardFormElement extends HTMLFormElement {
     this._resolveMembers = value;
   }
 
-  get recipientsElements() {
+  get recipientsElements(): UniposRecipientsElement[] {
     return [...this.elements].filter((e): e is UniposRecipientsElement => e instanceof UniposRecipientsElement);
   }
 }

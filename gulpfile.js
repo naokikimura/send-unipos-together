@@ -26,8 +26,9 @@ exports['transpile:sass'] = function sass() {
   return spawn('sass', ['src/:dist/'].concat(options));
 }
 
-exports['lint:tslint'] = function tslint() {
-  return spawn('tslint', ['-p', 'tsconfig.json']);
+exports['lint:eslint'] = function tslint() {
+  const options = ['.', '--ext', '.js,.jsx,.ts,.tsx'];
+  return spawn('eslint', options);
 }
 
 exports['lint:stylelint'] = function stylelint() {
@@ -92,7 +93,7 @@ exports['watch:scss'] = function watchSCSS() {
   return gulp.watch(sources.scss, task);
 }
 
-exports.lint = gulp.parallel(exports['lint:tslint'], exports['lint:stylelint']);
+exports.lint = gulp.parallel(exports['lint:eslint'], exports['lint:stylelint']);
 exports.transpile = gulp.parallel(exports['transpile:sass'], exports['transpile:tsc']);
 exports.build = gulp.parallel(exports.transpile, exports.assemble);
 exports.test = gulp.series(exports.build, exports['test:mocha']);

@@ -16,8 +16,8 @@ const i18n = new Internationalization({
 }, 'en', ...window.navigator.languages);
 
 export default class UniposRecipientsElement extends HTMLElement {
-  static get observedAttributes() { return ['required']; }
-  static get formAssociated() { return true; }
+  static get observedAttributes(): string[] { return ['required']; }
+  static get formAssociated(): boolean { return true; }
 
   private internals: ElementInternals;
   private input: HTMLInputElement = undefined;
@@ -49,14 +49,14 @@ export default class UniposRecipientsElement extends HTMLElement {
     shadow.appendChild(document.importNode(template.content, true));
 
     const inputSlot = shadow.querySelector<HTMLSlotElement>('slot[name="input"]');
-    inputSlot.addEventListener('slotchange', event => {
+    inputSlot.addEventListener('slotchange', () => {
       this.input = inputSlot.assignedElements({ flatten: true })
         .filter((element): element is HTMLInputElement => element instanceof HTMLInputElement)[0];
       this.validate();
     });
 
     const recipientsSlot = shadow.querySelector<HTMLSlotElement>('slot[name="recipients"]');
-    recipientsSlot.addEventListener('slotchange', event => {
+    recipientsSlot.addEventListener('slotchange', () => {
       this.mutationObserver.disconnect();
       for (const recipient of this.recipientElements) {
         this.mutationObserver.observe(recipient, { attributes: true, attributeFilter: ['disabled', 'data-id'] });
@@ -67,7 +67,7 @@ export default class UniposRecipientsElement extends HTMLElement {
     });
   }
 
-  public attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null) {
+  public attributeChangedCallback(name: string): void {
     switch (name) {
       case 'required':
         if (this.required) this.validate();
@@ -78,23 +78,23 @@ export default class UniposRecipientsElement extends HTMLElement {
     }
   }
 
-  public formResetCallback() {
+  public formResetCallback(): void {
     for (const element of this.recipientElements) element.remove();
   }
 
-  public formAssociatedCallback(form: HTMLFormElement) {
+  public formAssociatedCallback(): void {
     this.setFormValue();
   }
 
-  public formDisabledCallback(disabled: boolean) {
+  public formDisabledCallback(): void {
     this.validate();
   }
 
-  public findMembers(...ids: string[]) {
+  public findMembers(...ids: string[]): UniposMember[] {
     return this.members.filter(member => ids.includes(member.id));
   }
 
-  public appendMember(...members: UniposMember[]) {
+  public appendMember(...members: UniposMember[]): UniposRecipientsElement {
     const fragment = members.reduce((element, member) => {
       element.appendChild(this.createRecipientNode(member));
       return element;
@@ -103,14 +103,14 @@ export default class UniposRecipientsElement extends HTMLElement {
     return this;
   }
 
-  private createRecipientNode(member: UniposMember) {
+  private createRecipientNode(member: UniposMember): UniposRecipientElement {
     const element = this.ownerDocument.createElement('unipos-recipient') as UniposRecipientElement;
     element.member = member;
     element.setAttribute('slot', 'recipients');
     return element;
   }
 
-  private setFormValue() {
+  private setFormValue(): void {
     const data = this.recipientElements
       .filter(recipient => !recipient.disabled)
       .reduce((formData, recipient) => {
@@ -120,17 +120,17 @@ export default class UniposRecipientsElement extends HTMLElement {
     this.internals.setFormValue(data);
   }
 
-  private validate() {
+  private validate(): void {
     this.internals.setValidity({
       valueMissing: this.required && this.recipientElements.filter(recipient => !recipient.disabled).length === 0,
     }, i18n.getMessage('valueMissing'), this.input);
   }
 
-  get form() {
+  get form(): HTMLFormElement {
     return this.internals.form;
   }
 
-  get name() {
+  get name(): string {
     return this.getAttribute('name');
   }
 
@@ -138,7 +138,7 @@ export default class UniposRecipientsElement extends HTMLElement {
     this.setAttribute('name', value);
   }
 
-  get disabled() {
+  get disabled(): boolean {
     return this.hasAttribute('disabled');
   }
 
@@ -147,7 +147,7 @@ export default class UniposRecipientsElement extends HTMLElement {
     else this.removeAttribute('disabled');
   }
 
-  get required() {
+  get required(): boolean {
     return this.hasAttribute('required');
   }
 
@@ -156,12 +156,12 @@ export default class UniposRecipientsElement extends HTMLElement {
     else this.removeAttribute('required');
   }
 
-  get members() {
+  get members(): UniposMember[] {
     return [...this.recipientElements]
       .map(recipient => recipient.member);
   }
 
-  get recipientElements() {
+  get recipientElements(): UniposRecipientElement[] {
     const recipientsSlot = this.shadowRoot.querySelector<HTMLSlotElement>('slot[name="recipients"]');
     return recipientsSlot.assignedElements({ flatten: true })
       .filter((element): element is UniposRecipientElement => element instanceof UniposRecipientElement);

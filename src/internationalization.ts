@@ -1,6 +1,12 @@
-// See https://tc39.es/ecma402/#sec-bestavailablelocale
-function bestAvailableLocale(availableLocales: string[], locale: string) {
+/**
+ * 
+ * @param availableLocales 
+ * @param locale 
+ * @see https://tc39.es/ecma402/#sec-bestavailablelocale
+ */
+function bestAvailableLocale(availableLocales: string[], locale: string): string {
   let candidate = locale;
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     if (availableLocales.includes(candidate)) return candidate;
     const pos = candidate.lastIndexOf('-');
@@ -9,8 +15,14 @@ function bestAvailableLocale(availableLocales: string[], locale: string) {
   }
 }
 
-// https://tc39.es/ecma402/#sec-lookupmatcher
-function lookupMatcher(this: { defaultLocale: string }, availableLocales: string[], requestedLocales: string[]) {
+/**
+ * 
+ * @param this 
+ * @param availableLocales 
+ * @param requestedLocales 
+ * @see https://tc39.es/ecma402/#sec-lookupmatcher
+ */
+function lookupMatcher(this: { defaultLocale: string }, availableLocales: string[], requestedLocales: string[]): string {
   for (const locale of requestedLocales) {
     const noExtensionsLocale = locale.replace(/-u(?:-[0-9a-z]{2,8})+/gi, '');
     const availableLocale = bestAvailableLocale(availableLocales, noExtensionsLocale);
@@ -38,7 +50,7 @@ export default class Internationalization {
     this._defaultMessages = messagesDictionary[defaultLocale] || {};
   }
 
-  public getMessage(messageName: string) {
+  public getMessage(messageName: string): string {
     const message = this._messages[messageName] && this._messages[messageName].message;
     return message || this._defaultMessages[messageName] && this._defaultMessages[messageName].message;
   }

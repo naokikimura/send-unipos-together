@@ -3,13 +3,14 @@ import UniposCardFormElement from './unipos/card-form/element.js';
 import UniposPointElement from './unipos/point/element.js';
 import UniposRecipientsElement from './unipos/recipients/element.js';
 import UniposSuggestMembersElement from './unipos/suggest-members/element.js';
+import { UniposProfile, UniposMember } from './unipos/index.js';
 
 const api = new UniposAPI({
-  load: () => browser.tabs.executeScript({
+  load: (): Promise<[string, string]> => browser.tabs.executeScript({
     code: `[window.localStorage.getItem('authnToken'), window.localStorage.getItem('refreshToken')]`,
   }).then(results => (results[0] as [string, string])),
 
-  save: (authnToken, refreshToken) => browser.tabs.executeScript({
+  save: (authnToken, refreshToken): Promise<void> => browser.tabs.executeScript({
     code: `window.localStorage.setItem('authnToken', '${authnToken}'); window.localStorage.setItem('refreshToken', '${refreshToken}');`,
   }).then(),
 });
@@ -19,9 +20,10 @@ window.addEventListener('DOMContentLoaded', () => {
   const progress = document.getElementById('progress') as HTMLProgressElement;
   const statusText = document.getElementById('status_text');
   const recipients = document.getElementById('recipients') as UniposRecipientsElement;
+  const dialog = document.getElementById('dialog') as HTMLDialogElement;
 
   for (const point of document.querySelectorAll<UniposPointElement>('input[is="unipos-point"]')) {
-    point.fetchAvailablePoint = async () => {
+    point.fetchAvailablePoint = async (): Promise<number> => {
       try {
         const profile = await api.getProfile();
         return profile && profile.member.pocket.available_point;
@@ -32,7 +34,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   for (const suggestMembers of document.querySelectorAll<UniposSuggestMembersElement>('input[is="unipos-suggest-members"]')) {
-    suggestMembers.findSuggestMembers = value => api.findSuggestMembers(value, 10)
+    suggestMembers.findSuggestMembers = (value): Promise<UniposMember[]> => api.findSuggestMembers(value, 10)
       .catch(reason => {
         console.error(reason);
         return [];
@@ -40,15 +42,15 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   const form = document.querySelector<UniposCardFormElement>('form[is="unipos-card-form"]');
-  form.fetchProfile = () => api.getProfile();
-  form.sendCard = (...args) => api.sendCard(...args).then(result => { });
+  form.fetchProfile = (): Promise<UniposProfile> => api.getProfile();
+  form.sendCard = (...args): Promise<void> => api.sendCard(...args).then(() => undefined);
 
-  form.addEventListener('reset', event => {
+  form.addEventListener('reset', () => {
     progress.value = 0;
     statusText.textContent = '';
   });
 
-  form.addEventListener('cardsubmit', (event: CustomEvent) => {
+  form.addEventListener('cardsubmit', () => {
     progress.value = 0;
     progress.max = recipients.members.length;
     statusText.textContent = browser.i18n.getMessage('card_submit');
@@ -57,7 +59,7 @@ window.addEventListener('DOMContentLoaded', () => {
     dialog.showModal();
   });
 
-  form.addEventListener('cardsubmitted', (event: CustomEvent) => {
+  form.addEventListener('cardsubmitted', () => {
     statusText.textContent = browser.i18n.getMessage('card_submitted');
     dialog.querySelector<HTMLButtonElement>('form button[value="ok"]').disabled = false;
     dialog.querySelector<HTMLButtonElement>('form button[value="cancel"]').disabled = true;
@@ -95,8 +97,7 @@ window.addEventListener('DOMContentLoaded', () => {
     console.info(`Sent Unipos to ${to.display_name}`);
   });
 
-  const dialog = document.getElementById('dialog') as HTMLDialogElement;
-  dialog.addEventListener('close', event => {
+  dialog.addEventListener('close', () => {
     switch (dialog.returnValue) {
       case 'cancel':
         form.cancel();
