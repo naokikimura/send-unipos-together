@@ -1,5 +1,5 @@
 @import url("/dist/ress/dist/ress.min.css");
-@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
+@import url("/dist/material-design-icons/iconfont/material-icons.css");
 
 body {
   margin: 0;
