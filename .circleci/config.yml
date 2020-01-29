@@ -2,36 +2,145 @@
 #
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
-version: 2
-jobs:
-  build:
-    docker:
-      # specify the version you desire here
-      - image: circleci/node:13-browsers
+version: 2.1
 
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/mongo:3.4.4
+executors:
+  default:
+    docker:
+    # specify the version you desire here
+    - image: circleci/node:13-browsers
+
+    # Specify service dependencies here if necessary
+    # CircleCI maintains a library of pre-built images
+    # documented at https://circleci.com/docs/2.0/circleci-images/
+    # - image: circleci/mongo:3.4.4
 
     working_directory: ~/repo
 
+commands:
+  restore_node_modules:
+    steps:
+    # Download and cache dependencies
+    - restore_cache:
+        keys:
+        - v1-dependencies-{{ checksum "package.json" }}
+        # fallback to using the latest cache if no exact match is found
+        - v1-dependencies-
+
+jobs:
+  setup:
+    executor:
+      name: default
+
+    steps:
+    - checkout
+    - restore_node_modules
+    - run: npm install
+
+    - save_cache:
+        paths:
+        - node_modules
+        key: v1-dependencies-{{ checksum "package.json" }}
+
+  test:
+    executor:
+      name: default
+
+    steps:
+    - checkout
+    - restore_node_modules
+
+    # run tests!
+    - run: npm test
+
+    - store_test_results:
+        path: ./reports
+
+  lint:
+    executor:
+      name: default
+
+    steps:
+    - checkout
+    - restore_node_modules
+
+    - run: npx gulp lint
+
+    - store_test_results:
+        path: ./reports
+
+  deploy:
+    executor:
+      name: default
+
     steps:
       - checkout
+      - restore_node_modules
 
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "package.json" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+      - deploy:
+          command: npx gulp deploy
 
-      - run: npm install
+      - store_artifacts:
+          path: ./artifacts
 
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
+  publish:
+    executor:
+      name: default
 
-      # run tests!
-      - run: npm test
+    steps:
+      - checkout
+      - restore_node_modules
+
+      - deploy:
+          command: npx gulp publish
+
+workflows:
+  setup-test-publish:
+    jobs:
+    - setup:
+        filters:
+          tags:
+            only: /.*/
+          branches:
+            only: /.*/
+    - test:
+        filters:
+          tags:
+            only: /.*/
+          branches:
+            only: /.*/
+        requires:
+        - setup
+    - lint:
+        filters:
+          tags:
+            only: /.*/
+          branches:
+            only: /.*/
+        requires:
+        - setup
+    - deploy:
+        filters:
+          tags:
+            only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
+          branches:
+            ignore: /.*/
+        requires:
+        - test
+    - hold:
+        type: approval
+        filters:
+          tags:
+            only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
+          branches:
+            ignore: /.*/
+        requires:
+        - deploy
+    - publish:
+        filters:
+          tags:
+            only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
+          branches:
+            ignore: /.*/
+        requires:
+        - hold

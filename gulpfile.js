@@ -27,16 +27,34 @@ exports['transpile:sass'] = function sass() {
 }
 
 exports['lint:eslint'] = function tslint() {
-  const options = ['.', '--ext', '.js,.jsx,.ts,.tsx'];
+  const options = ['.', '--ext', '.js,.jsx,.ts,.tsx']
+    .concat(process.env.CI ? ['-f', 'junit', '-o', './reports/eslint/test-results.xml'] : []);
   return spawn('eslint', options);
 }
 
-exports['lint:stylelint'] = function stylelint() {
-  return spawn('stylelint', [sources.scss]);
+exports['lint:stylelint'] = async function stylelint() {
+  if (process.env.CI) {
+    const fs = require('fs');
+    const util = require('util');
+    await util.promisify(fs.mkdir)('./reports/stylelint/', { recursive: true });
+  }
+  const options = process.env.CI
+    ? [
+      '--custom-formatter',
+      './node_modules/stylelint-junit-formatter',
+      '-o',
+      './reports/stylelint/test-results.xml',
+    ]
+    : [];
+  const stdio = ['pipe', process.env.CI ? 'ignore' : 'pipe', 'pipe'];
+  return spawn('stylelint', options.concat([sources.scss]), { stdio });
 }
 
 exports['test:mocha'] = function mocha() {
-  return spawn('mocha', ['-c']);
+  const options = process.env.CI
+    ? ['-R', 'xunit', '-O', 'output=./reports/mocha/test-results.xml']
+    : ['-c'];
+  return spawn('mocha', options);
 }
 
 exports.assemble = function assemble() {
@@ -58,6 +76,8 @@ exports['package:zip'] = function zip() {
   const ignore = [
     '*.zip',
     '.*',
+    'artifacts',
+    'artifacts/**/*',
     'client_secret_*.json',
     'coverage',
     'coverage/**/*',
@@ -65,6 +85,8 @@ exports['package:zip'] = function zip() {
     'node_modules',
     'node_modules/**/*',
     'package{,-lock}.json',
+    'reports',
+    'reports/**/*',
     'stylelint.config.js',
     'test',
     'test/**/*',
@@ -73,22 +95,22 @@ exports['package:zip'] = function zip() {
   ];
   return gulp.src('./**/*', { ignore })
     .pipe(zip(`${package.name}-${package.version}.zip`))
-    .pipe(gulp.dest('.'));
+    .pipe(gulp.dest('./artifacts'));
 }
 
-const webstore = require('gulp-chrome-web-store')(
-  'pgpnkghddnfoopjapnlklllpjknnibkn',
+const chromeWebstore = require('gulp-chrome-web-store')(
   process.env.CHROME_WEB_STORE_API_CREDENTIAL,
   process.env.CHROME_WEB_STORE_API_ACCESS_TOKEN_RESPONSE,
 );
+const item = chromeWebstore.item('pgpnkghddnfoopjapnlklllpjknnibkn');
 
 exports.publish = function publish() {
-  return webstore.publish();
+  return item.publish();
 }
 
 exports['deploy:upload'] = function upload() {
-  return gulp.src(`${package.name}-${package.version}.zip`)
-    .pipe(webstore.upload());
+  return gulp.src(`./artifacts/${package.name}-${package.version}.zip`)
+    .pipe(item.upload());
 }
 
 exports['watch:typescript'] = function watchTypeScript() {
@@ -99,6 +121,13 @@ exports['watch:typescript'] = function watchTypeScript() {
 exports['watch:scss'] = function watchSCSS() {
   const task = gulp.parallel(exports['transpile:sass'], exports['lint:stylelint']);
   return gulp.watch(sources.scss, task);
+}
+
+exports['version:unify'] = () => {
+  const unify = require('gulp-unify-versions');
+  return gulp.src('./manifest.json')
+    .pipe(unify('./package.json'))
+    .pipe(gulp.dest('./'));
 }
 
 exports.lint = gulp.parallel(exports['lint:eslint'], exports['lint:stylelint']);
