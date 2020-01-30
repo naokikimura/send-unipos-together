@@ -8,7 +8,7 @@ executors:
   default:
     docker:
     # specify the version you desire here
-    - image: circleci/node:13-browsers
+    - image: circleci/node:lts
 
     # Specify service dependencies here if necessary
     # CircleCI maintains a library of pre-built images
