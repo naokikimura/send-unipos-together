@@ -15,7 +15,7 @@ import * as puppeteer from 'puppeteer';
     this.browser = browser;
 
     const extensionPage = await browser.newPage();
-    const extensionPopupHtml = 'popup.html';
+    const extensionPopupHtml = 'resources/popup.html';
     const extensionID = ((targets): string => {
       const extensionTarget = targets.find(target => target.type() === 'background_page');
       const [, , id] = extensionTarget.url().split('/');

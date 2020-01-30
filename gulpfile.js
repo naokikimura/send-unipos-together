@@ -74,24 +74,16 @@ exports.assemble = function assemble() {
 exports['pack:zip'] = function zip() {
   const zip = require('gulp-zip');
   const ignore = [
-    '*.zip',
     '.*',
-    'artifacts',
-    'artifacts/**/*',
-    'client_secret_*.json',
-    'coverage',
-    'coverage/**/*',
+    'artifacts{,/**/*}',
+    'coverage{,/**/*}',
     'gulpfile.js',
-    'node_modules',
-    'node_modules/**/*',
+    'node_modules{,/**/*}',
     'package{,-lock}.json',
-    'reports',
-    'reports/**/*',
+    'reports{,/**/*}',
     'stylelint.config.js',
-    'test',
-    'test/**/*',
+    'test{,/**/*}',
     'tsconfig.json',
-    'tslint.json',
   ];
   return gulp.src('./**/*', { ignore })
     .pipe(zip(`${package.name}-${package.version}.zip`))
