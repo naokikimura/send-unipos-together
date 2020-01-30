@@ -71,7 +71,7 @@ exports.assemble = function assemble() {
     .pipe(gulp.dest('dist'));
 }
 
-exports['package:zip'] = function zip() {
+exports['pack:zip'] = function zip() {
   const zip = require('gulp-zip');
   const ignore = [
     '*.zip',
@@ -134,7 +134,7 @@ exports.lint = gulp.parallel(exports['lint:eslint'], exports['lint:stylelint']);
 exports.transpile = gulp.parallel(exports['transpile:sass'], exports['transpile:tsc']);
 exports.build = gulp.parallel(exports.transpile, exports.assemble);
 exports.test = gulp.series(exports.build, exports['test:mocha']);
-exports.package = gulp.series(exports.build, exports['package:zip']);
-exports.deploy = gulp.series(exports.package, exports['deploy:upload']);
+exports.pack = gulp.series(exports.build, exports['pack:zip']);
+exports.deploy = gulp.series(exports.pack, exports['deploy:upload']);
 exports.watch = gulp.parallel(exports['watch:typescript'], exports['watch:scss']);
 exports.default = exports.build;
