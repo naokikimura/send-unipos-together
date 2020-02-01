@@ -71,27 +71,19 @@ exports.assemble = function assemble() {
     .pipe(gulp.dest('dist'));
 }
 
-exports['package:zip'] = function zip() {
+exports['pack:zip'] = function zip() {
   const zip = require('gulp-zip');
   const ignore = [
-    '*.zip',
     '.*',
-    'artifacts',
-    'artifacts/**/*',
-    'client_secret_*.json',
-    'coverage',
-    'coverage/**/*',
+    'artifacts{,/**/*}',
+    'coverage{,/**/*}',
     'gulpfile.js',
-    'node_modules',
-    'node_modules/**/*',
+    'node_modules{,/**/*}',
     'package{,-lock}.json',
-    'reports',
-    'reports/**/*',
+    'reports{,/**/*}',
     'stylelint.config.js',
-    'test',
-    'test/**/*',
+    'test{,/**/*}',
     'tsconfig.json',
-    'tslint.json',
   ];
   return gulp.src('./**/*', { ignore })
     .pipe(zip(`${package.name}-${package.version}.zip`))
@@ -114,7 +106,7 @@ exports['deploy:upload'] = function upload() {
 }
 
 exports['watch:typescript'] = function watchTypeScript() {
-  const task = gulp.parallel(exports['transpile:tsc'], exports['lint:tslint']);
+  const task = gulp.parallel(exports['transpile:tsc'], exports['lint:eslint']);
   return gulp.watch(sources.typescript, task);
 }
 
@@ -134,7 +126,7 @@ exports.lint = gulp.parallel(exports['lint:eslint'], exports['lint:stylelint']);
 exports.transpile = gulp.parallel(exports['transpile:sass'], exports['transpile:tsc']);
 exports.build = gulp.parallel(exports.transpile, exports.assemble);
 exports.test = gulp.series(exports.build, exports['test:mocha']);
-exports.package = gulp.series(exports.build, exports['package:zip']);
-exports.deploy = gulp.series(exports.package, exports['deploy:upload']);
+exports.pack = gulp.series(exports.build, exports['pack:zip']);
+exports.deploy = gulp.series(exports.pack, exports['deploy:upload']);
 exports.watch = gulp.parallel(exports['watch:typescript'], exports['watch:scss']);
 exports.default = exports.build;
