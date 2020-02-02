@@ -1,4 +1,37 @@
 {
+  "extensionName": {
+    "message": "Send Unipos together"
+  },
+  "extensionDescription": {
+    "message": "この拡張機能を使用すると、Uniposを一度に複数の宛先に一斉送信できます。"
+  },
+  "recipients_placeholder": {
+    "message": "宛先"
+  },
+  "point_placeholder": {
+    "message": "ポイント"
+  },
+  "point_label": {
+    "message": "ポイント"
+  },
+  "message_placeholder": {
+    "message": "メッセージ"
+  },
+  "message_label": {
+    "message": "メッセージ"
+  },
+  "buttons_reset": {
+    "message": "リセット"
+  },
+  "buttons_submit": {
+    "message": "おくる"
+  },
+  "buttons_cancel": {
+    "message": "キャンセル"
+  },
+  "buttons_ok": {
+    "message": "OK"
+  },
   "card_submitted": {
     "message": "おくりました 🎉"
   },

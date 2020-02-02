@@ -1,5 +1,11 @@
+import Localizer from "./localizer.js";
+
+const localizer = new Localizer();
+
 window.addEventListener('DOMContentLoaded', () => {
-  chrome.storage.sync.get(['options'], result => {
+  localizer.localize();
+
+  browser.storage.sync.get(['options']).then(result => {
     const { point = null, message = '' } = result.options || {};
     document.querySelector<HTMLInputElement>('form#options [name="point"]').value = point === null ? '' : point;
     document.querySelector<HTMLTextAreaElement>('form#options [name="message"]').value = message;
@@ -13,6 +19,6 @@ window.addEventListener('DOMContentLoaded', () => {
       message: data.get('message'),
       point: data.get('point'),
     };
-    chrome.storage.sync.set({ options });
+    browser.storage.sync.set({ options });
   });
 });

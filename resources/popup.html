@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-
-<html lang="ja">
+<html data-chrome-i18n="lang=@@ui_locale">
 
 <head>
   <meta charset="UTF-8" />
-  <title>Send Unipos together</title>
+  <title data-chrome-i18n="extensionName"></title>
   <link rel="stylesheet" type="text/css" href="/dist/popup.css">
   <script type="module" src="/dist/webextension-polyfill/dist/browser-polyfill.min.js"></script>
   <script type="module" src="/dist/popup.js"></script>
@@ -43,21 +42,22 @@
       <fieldset>
         <unipos-recipients id="recipients" name="to" required>
           <input is="unipos-suggest-members" slot="input" type="search" list="suggest_members" autofocus
-            placeholder="宛先" />
+            data-chrome-i18n="placeholder=recipients_placeholder" />
           <datalist id="suggest_members"></datalist>
         </unipos-recipients>
       </fieldset>
       <span id="point">
         <input is="unipos-point" type="number" name="point" min="0" max="120" recipients="recipients" required
-          placeholder="ポイント" />
+          data-chrome-i18n="placeholder=point_placeholder" />
       </span>
       <span id="message">
-        <textarea is="unipos-message" name="message" rows="3" required placeholder="メッセージ"></textarea>
+        <textarea is="unipos-message" name="message" rows="3" required
+          data-chrome-i18n="placeholder=message_placeholder"></textarea>
       </span>
     </fieldset>
     <fieldset id="buttons">
-      <button type="reset">リセット</button>
-      <button type="submit">おくる</button>
+      <button type="reset" data-chrome-i18n="buttons_reset"></button>
+      <button type="submit" data-chrome-i18n="buttons_submit"></button>
     </fieldset>
   </form>
   <dialog id="dialog">
@@ -69,8 +69,8 @@
         <progress id="progress" value="0"></progress>
       </fieldset>
       <fieldset>
-        <button value="cancel">キャンセル</button>
-        <button value="ok">OK</button>
+        <button value="cancel" data-chrome-i18n="buttons_cancel"></button>
+        <button value="ok" data-chrome-i18n="buttons_ok"></button>
       </fieldset>
     </form>
   </dialog>

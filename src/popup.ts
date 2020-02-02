@@ -4,6 +4,7 @@ import UniposPointElement from './unipos/point/element.js';
 import UniposRecipientsElement from './unipos/recipients/element.js';
 import UniposSuggestMembersElement from './unipos/suggest-members/element.js';
 import { UniposProfile, UniposMember } from './unipos/index.js';
+import Localizer from './localizer.js';
 
 const api = new UniposAPI({
   load: (): Promise<[string, string]> => browser.tabs.executeScript({
@@ -15,8 +16,12 @@ const api = new UniposAPI({
   }).then(),
 });
 
+const localizer = new Localizer();
+
 // tslint:disable: no-console
 window.addEventListener('DOMContentLoaded', () => {
+  localizer.localize();
+
   const progress = document.getElementById('progress') as HTMLProgressElement;
   const statusText = document.getElementById('status_text');
   const recipients = document.getElementById('recipients') as UniposRecipientsElement;

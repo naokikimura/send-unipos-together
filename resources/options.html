@@ -1,17 +1,18 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html data-chrome-i18n="lang=@@ui_locale">
 
 <head>
   <meta charset="UTF-8">
-  <title>オプション | Send Unipos together</title>
+  <title data-chrome-i18n="extensionName"></title>
   <link rel="stylesheet" type="text/css" href="/dist/options.css">
+  <script type="module" src="/dist/webextension-polyfill/dist/browser-polyfill.min.js"></script>
   <script type="module" src="/dist/options.js"></script>
 </head>
 
 <body>
   <form action="" method="post" enctype="multipart/form-data" id="options">
-    <label for="point">ポイント</label><input type="number" name="point" id="point" min="0" max="120" />
-    <label for="message">メッセージ</label><textarea name="message" id="message" rows="3"></textarea>
+    <label for="point" data-chrome-i18n="point_label"></label><input type="number" name="point" id="point" min="0" max="120" />
+    <label for="message" data-chrome-i18n="message_label"></label><textarea name="message" id="message" rows="3"></textarea>
   </form>
 </body>
 

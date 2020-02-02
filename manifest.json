@@ -1,14 +1,14 @@
 {
     "manifest_version": 2,
-    "name": "Send Unipos together",
+    "name": "__MSG_extensionName__",
     "version": "0.0.9",
     "default_locale": "ja",
-    "description": "This extension allows you to send Unipos to multiple destinations at once.",
+    "description": "__MSG_extensionDescription__",
     "icons": {
         "128": "resources/icons/128.png"
     },
     "page_action": {
-        "default_title": "Send Unipos together",
+        "default_title": "__MSG_extensionName__",
         "default_popup": "resources/popup.html"
     },
     "permissions": [
