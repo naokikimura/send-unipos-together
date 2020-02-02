@@ -1,0 +1,52 @@
+{
+  "extensionName": {
+    "message": "Send Unipos together"
+  },
+  "extensionDescription": {
+    "message": "This extension allows you to send Unipos to multiple destinations at once."
+  },
+  "recipients_placeholder": {
+    "message": "Recipient"
+  },
+  "point_placeholder": {
+    "message": "Point"
+  },
+  "point_label": {
+    "message": "Point"
+  },
+  "message_placeholder": {
+    "message": "Message"
+  },
+  "message_label": {
+    "message": "Message"
+  },
+  "buttons_reset": {
+    "message": "Reset"
+  },
+  "buttons_submit": {
+    "message": "Send"
+  },
+  "buttons_cancel": {
+    "message": "Cancel"
+  },
+  "card_submitted": {
+    "message": "Sent 🎉"
+  },
+  "send": {
+    "message": "Sending to $TO$ ...",
+    "placeholders": {
+      "to": {
+        "content": "$1"
+      }
+    }
+  },
+  "card_submitting_error": {
+    "message": "Could not send 🙇"
+  },
+  "card_submit_canceled": {
+    "message": "Canceled."
+  },
+  "card_submit": {
+    "message": "Will send."
+  }
+}
