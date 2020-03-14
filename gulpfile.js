@@ -26,9 +26,9 @@ exports['transpile:sass'] = function sass() {
   return spawn('sass', ['src/:dist/'].concat(options));
 }
 
-exports['lint:eslint'] = function tslint() {
+exports['lint:eslint'] = function eslint() {
   const options = ['.', '--ext', '.js,.jsx,.ts,.tsx']
-    .concat(process.env.CI ? ['-f', 'junit', '-o', './reports/eslint/test-results.xml'] : []);
+    .concat(process.env.CI ? ['-f', 'junit', '-o', './reports/eslint/test-result.xml'] : []);
   return spawn('eslint', options);
 }
 
@@ -43,7 +43,7 @@ exports['lint:stylelint'] = async function stylelint() {
       '--custom-formatter',
       './node_modules/stylelint-junit-formatter',
       '-o',
-      './reports/stylelint/test-results.xml',
+      './reports/stylelint/test-result.xml',
     ]
     : [];
   const stdio = ['pipe', process.env.CI ? 'ignore' : 'pipe', 'pipe'];
@@ -52,7 +52,7 @@ exports['lint:stylelint'] = async function stylelint() {
 
 exports['test:mocha'] = function mocha() {
   const options = process.env.CI
-    ? ['-R', 'xunit', '-O', 'output=./reports/mocha/test-results.xml']
+    ? ['-R', 'xunit', '-O', 'output=./reports/mocha/test-result.xml']
     : ['-c'];
   return spawn('mocha', options);
 }
