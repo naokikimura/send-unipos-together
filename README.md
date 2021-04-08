@@ -4,7 +4,7 @@
 
 Chrome extension to send Unipos together
 
-# See also
+## See also
 
 - [Send Unipos together - Chrome Web Store](https://chrome.google.com/webstore/detail/send-unipos-together/pgpnkghddnfoopjapnlklllpjknnibkn)
 - [GulpとCircleCIでChrome拡張機能のリリースプロセスを自動化してみた - Qiita](https://qiita.com/naokikimura/items/2708dc646c5b6f1509ab)
