@@ -12,10 +12,12 @@
         "default_popup": "resources/popup.html"
     },
     "permissions": [
-        "https://unipos.me/*",
         "storage",
         "activeTab",
         "declarativeContent"
+    ],
+    "host_permissions": [
+        "https://unipos.me/*"
     ],
     "background": {
         "scripts": [
