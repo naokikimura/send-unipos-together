@@ -1,5 +1,5 @@
 {
-    "manifest_version": 2,
+    "manifest_version": 3,
     "name": "__MSG_extensionName__",
     "version": "0.0.10",
     "default_locale": "ja",
@@ -25,5 +25,6 @@
     },
     "options_ui": {
         "page": "resources/options.html"
-    }
+    },
+    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxP7Mg5FVAS8xfjG1AUiQw05erfztD/99aw1zKMd7sSV/8F3k3zVCgLdShRykwWNjzTaUdnMHn1VTCLYqBTuZV2zGrIOh86H6kt4lNnOIp1eiNfaDFQzGpue35kx8EdfiB7VXh6KMt+v/nxF0x38ZLid8D0sMhF0qbEjy3uAqsl4nwibr1dG84oJ6mbqsO9BticX7a/yra+HlzBSrvxd6nbPGHZKQcBR1EC6vWkO2/J6OvyX215qOVH3y6aYI5w7W6na6AOyduHbGYJcoxbe6cRyZJfwRYAc9BQz8KrxSpfhzi+z+9tt23mWYgrsc0WtLgxKm/xCvwJfXNU/Ml9PucwIDAQAB"
 }

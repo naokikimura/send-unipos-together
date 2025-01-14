@@ -3,7 +3,8 @@
     "outDir": "./dist",
     "target": "ES2019",
     "strictBindCallApply": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "moduleResolution": "node",
   },
   "include": [
     "./src/**/*"
